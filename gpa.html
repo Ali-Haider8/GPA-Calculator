@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة ومُنتبئ المعدل الفصلي - الإصدار المتقدم</title>
+    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
@@ -19,23 +19,22 @@
 
         .app-container {
             background-color: #f0f0f0;
-            border-top: 2px solid #ffffff;
-            border-left: 2px solid #ffffff;
-            border-right: 2px solid #a0a0a0;
-            border-bottom: 2px solid #a0a0a0;
+            border: 2px solid #a0a0a0;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
             padding: 25px;
             border-radius: 8px;
             box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
         }
 
+        /* الشاشة العلوية */
         .gpa-screen {
             background-color: #f4fdf4;
-            border-top: 3px solid #a0a0a0;
-            border-left: 3px solid #a0a0a0;
-            border-right: 3px solid #ffffff;
-            border-bottom: 3px solid #ffffff;
+            border: 3px solid #a0a0a0;
+            border-bottom-color: #ffffff;
+            border-right-color: #ffffff;
             height: 110px;
             display: flex;
             flex-direction: column;
@@ -44,111 +43,124 @@
             margin-bottom: 20px;
             transition: all 0.3s;
         }
-
         .gpa-label { font-size: 1.1rem; color: #555; font-weight: bold; margin-bottom: 5px;}
         .gpa-value { font-size: 3rem; font-weight: bold; color: #2e7d32; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
 
-        /* منطقة أدوات التحكم */
-        .controls-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .controls {
-            padding: 12px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            border: 1px solid;
-        }
-
+        .controls-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .controls { padding: 12px; border-radius: 5px; font-weight: bold; display: flex; align-items: center; cursor: pointer; border: 1px solid; }
         .controls.predict { background-color: #e3f2fd; border-color: #90caf9; color: #1565c0; }
         .controls.edit-ects { background-color: #f3e5f5; border-color: #ce93d8; color: #6a1b9a; }
-
         .controls input[type="checkbox"] { width: 20px; height: 20px; margin-left: 10px; cursor: pointer; }
 
-        /* رسالة التنبيه للوحدات */
-        .warning-box {
-            background-color: #d32f2f;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: none;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-        }
+        .warning-box { background-color: #d32f2f; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; }
 
-        table { width: 100%; border-collapse: collapse; background-color: #fff; }
+        table { width: 100%; border-collapse: collapse; background-color: #fff; margin-bottom: 20px; }
         th, td { border: 1px solid #c0c0c0; padding: 10px 8px; text-align: center; }
-        th { background-color: #4CAF50; color: white; font-size: 1.1rem; border: 1px solid #388E3C; transition: background-color 0.3s; }
+        th { background-color: #4CAF50; color: white; font-size: 1rem; border: 1px solid #388E3C; }
         th.predict-active { background-color: #f57c00; border-color: #ef6c00; }
 
-        input[type="number"] {
-            width: 65px;
-            padding: 8px;
-            border-top: 2px solid #a0a0a0;
-            border-left: 2px solid #a0a0a0;
-            border-right: 2px solid #ffffff;
-            border-bottom: 2px solid #ffffff;
-            background-color: #fafafa;
-            text-align: center;
-            font-size: 1.1rem;
-            outline: none;
-            transition: all 0.3s;
-        }
-
+        input[type="number"] { width: 65px; padding: 6px; border: 1px solid #ccc; text-align: center; font-size: 1.1rem; outline: none; }
         input[type="number"]:focus { background-color: #e8f5e9; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* تصميم خاص لحقل الوحدات */
-        .ects-input {
-            width: 50px;
-            border: none !important;
-            background: transparent !important;
-            font-weight: bold;
-            color: #333;
-            cursor: default;
-        }
-        .ects-input.editable {
-            border-top: 2px solid #a0a0a0 !important;
-            border-left: 2px solid #a0a0a0 !important;
-            border-right: 2px solid #ffffff !important;
-            border-bottom: 2px solid #ffffff !important;
-            background-color: #fffde7 !important;
-            cursor: text;
-        }
-        .ects-input.error { border: 2px solid red !important; color: red !important; background-color: #ffebee !important; }
-
-        select { padding: 6px; font-size: 1rem; font-family: inherit; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        .ects-input { width: 50px; border: none !important; background: transparent !important; font-weight: bold; color: #333; cursor: default; }
+        .ects-input.editable { border: 1px solid #aaa !important; background-color: #fffde7 !important; cursor: text; }
+        .ects-input.error { border: 2px solid red !important; color: red !important; }
+        
+        select { padding: 8px; font-size: 1rem; font-family: inherit; border: 1px solid #ccc; border-radius: 4px; outline: none; background-color: #fff; }
 
         .grade-excellent { background-color: #c8e6c9; color: #1b5e20; font-weight: bold; }
         .grade-vgood { background-color: #e8f5e9; color: #2e7d32; }
         .grade-fx { background-color: #fff9c4; color: #f57f17; font-weight: bold; }
         .grade-fail { background-color: #ffcdd2; color: #b71c1c; font-weight: bold; }
+
+        /* --- تصميم قسم المعلومات السفلية (الجديد) --- */
+        .footer-section {
+            background-color: #e6e6e6;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #c0c0c0;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .info-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-grid .full-width { grid-column: span 2; display: flex; flex-direction: column; }
+        
+        .info-grid label {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.95rem;
+            color: #444;
+            font-weight: bold;
+        }
+
+        .info-grid input[type="text"], .info-grid select {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        /* زر الحفظ الجانبي */
+        .save-action {
+            width: 160px;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .btn-success {
+            width: 100%;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            font-family: inherit;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+
+        .btn-success:hover { background-color: #1b5e20; }
+
+        /* التجاوب مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .footer-section { flex-direction: column; }
+            .save-action { width: 100%; height: 60px; }
+            .info-grid { grid-template-columns: 1fr; }
+            .info-grid .full-width { grid-column: span 1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        
         <div class="gpa-screen" id="screen-container">
             <div class="gpa-label">التقدير الفصلي المتوقع</div>
-            <div class="gpa-value" id="final-gpa">--</div>
+            <div class="gpa-value" id="final-gpa-word">--</div>
         </div>
 
         <div class="warning-box" id="ects-warning">
-            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون المجموع بالضبط 30، وأن تكون كل مادة بين 2 و 8 وحدات!
+            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30!
         </div>
 
         <div class="controls-container">
             <label class="controls predict">
                 <input type="checkbox" id="predict-mode" onchange="mainUpdate()">
-                وضع التنبؤ: لم امتحن الفاينل بعد (حساب المطلوب بناءً على التقدير المستهدف)
+                وضع التنبؤ: حساب المطلوب بالفاينل بناءً على التقدير المستهدف
             </label>
             <label class="controls edit-ects">
                 <input type="checkbox" id="edit-ects-mode" onchange="toggleEctsEdit()">
@@ -159,7 +171,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>اسم المادة</th>
+                    <th>المادة</th>
                     <th>الوحدات</th>
                     <th>السعي (50)</th>
                     <th id="final-header">النهائي (50)</th>
@@ -169,10 +181,66 @@
             <tbody id="subjects-body">
                 </tbody>
         </table>
+
+        <div class="footer-section">
+            <div class="info-grid">
+                <div class="full-width">
+                    <label>اسم الطالب:
+                        <input type="text" id="student-name" placeholder="اختياري...">
+                    </label>
+                </div>
+                
+                <label>الجامعة:
+                    <input type="text" id="uni-name" placeholder="مثال: جامعة الكوفة" value="جامعة الكوفة">
+                </label>
+                <label>الكلية:
+                    <input type="text" id="college-name" placeholder="مثال: كلية علوم الحاسوب" value="كلية علوم الحاسوب والرياضيات">
+                </label>
+                
+                <label>القسم:
+                    <select id="dept-name">
+                        <option value="علوم الحاسوب" selected>علوم الحاسوب</option>
+                        <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
+                        <option value="شبكات الحاسوب">شبكات الحاسوب</option>
+                        <option value="الرياضيات">الرياضيات</option>
+                        <option value="">- فارغ -</option>
+                    </select>
+                </label>
+                <label>السنة الدراسية:
+                    <select id="academic-year">
+                        <option value="2025-2026" selected>2025-2026</option>
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2023-2024">2023-2024</option>
+                        <option value="">- فارغ -</option>
+                    </select>
+                </label>
+
+                <label>المرحلة:
+                    <select id="stage-name">
+                        <option value="الأولى" selected>الأولى</option>
+                        <option value="الثانية">الثانية</option>
+                        <option value="الثالثة">الثالثة</option>
+                        <option value="الرابعة">الرابعة</option>
+                        <option value="">- فارغ -</option>
+                    </select>
+                </label>
+                <label>الكورس (الفصل):
+                    <select id="semester-name">
+                        <option value="الأول" selected>الأول</option>
+                        <option value="الثاني">الثاني</option>
+                        <option value="">- فارغ -</option>
+                    </select>
+                </label>
+            </div>
+            
+            <div class="save-action">
+                <button class="btn-success" onclick="generateTextFile()">حفظ النتائج<br>(.txt)</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // البيانات الافتراضية
         const subjects = [
             { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
             { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
@@ -182,9 +250,11 @@
             { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
         ];
 
+        let globalGpaNumber = 0;
+        let globalGpaWord = "--";
+
         const tbody = document.getElementById('subjects-body');
 
-        // بناء الجدول
         subjects.forEach(sub => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -206,39 +276,25 @@
             tbody.appendChild(tr);
         });
 
-        // دالة تفعيل/إلغاء وضع تعديل الوحدات
         function toggleEctsEdit() {
             const isEditMode = document.getElementById('edit-ects-mode').checked;
             subjects.forEach(sub => {
                 const input = document.getElementById(`${sub.id}_ects`);
-                if (isEditMode) {
-                    input.readOnly = false;
-                    input.classList.add('editable');
-                } else {
-                    input.readOnly = true;
-                    input.classList.remove('editable');
-                }
+                if (isEditMode) { input.readOnly = false; input.classList.add('editable'); } 
+                else { input.readOnly = true; input.classList.remove('editable'); }
             });
             mainUpdate();
         }
 
-        // الدالة المركزية
         function mainUpdate() {
             const isPredictMode = document.getElementById('predict-mode').checked;
             const finalHeader = document.getElementById('final-header');
-            
             let totalWeightedScore = 0;
             let sumEcts = 0;
             let isEctsValid = true;
 
-            // تغيير مظهر العنوان
-            if (isPredictMode) {
-                finalHeader.innerText = "المطلوب بالفاينل";
-                finalHeader.classList.add("predict-active");
-            } else {
-                finalHeader.innerText = "النهائي (50)";
-                finalHeader.classList.remove("predict-active");
-            }
+            if (isPredictMode) { finalHeader.innerText = "المطلوب بالفاينل"; finalHeader.classList.add("predict-active"); } 
+            else { finalHeader.innerText = "النهائي (50)"; finalHeader.classList.remove("predict-active"); }
 
             subjects.forEach(sub => {
                 const ectsInput = document.getElementById(`${sub.id}_ects`);
@@ -248,19 +304,12 @@
                 const selectGrade = document.getElementById(`${sub.id}_grade_select`);
                 const gradeCell = document.getElementById(`${sub.id}_grade_cell`);
 
-                // 1. معالجة وتدقيق الوحدات (من 2 إلى 8)
                 let ectsVal = parseInt(ectsInput.value);
                 if (isNaN(ectsVal)) ectsVal = 0;
-
-                if (ectsVal < 2 || ectsVal > 8) {
-                    ectsInput.classList.add('error');
-                    isEctsValid = false;
-                } else {
-                    ectsInput.classList.remove('error');
-                }
+                if (ectsVal < 2 || ectsVal > 8) { ectsInput.classList.add('error'); isEctsValid = false; } 
+                else { ectsInput.classList.remove('error'); }
                 sumEcts += ectsVal;
 
-                // 2. معالجة درجات السعي والنهائي
                 let saei = parseFloat(saeiInput.value) || 0;
                 let final = 0;
                 let total = 0;
@@ -269,47 +318,34 @@
                 if (isPredictMode) {
                     textGrade.style.display = 'none';
                     selectGrade.style.display = 'inline-block';
-                    
                     finalInput.readOnly = true;
                     finalInput.style.backgroundColor = '#fff3e0'; 
-                    finalInput.style.border = '2px dashed #ffb74d';
 
                     const targetTotal = parseInt(selectGrade.value);
                     let requiredFinal = targetTotal - saei;
                     if(requiredFinal < 0) requiredFinal = 0;
-
                     finalInput.value = requiredFinal;
                     final = requiredFinal;
                     total = saei + final;
 
-                    // تنبيه للدرجة المستحيلة
-                    if (requiredFinal > 50) {
-                        finalInput.style.color = '#d32f2f';
-                        finalInput.style.fontWeight = 'bold';
-                    } else {
-                        finalInput.style.color = 'black';
-                        finalInput.style.fontWeight = 'normal';
-                    }
+                    if (requiredFinal > 50) finalInput.style.color = '#d32f2f';
+                    else finalInput.style.color = 'black';
+                    
                     applyColorToCell(gradeCell, targetTotal);
+                    sub.currentGradeText = selectGrade.options[selectGrade.selectedIndex].text;
 
                 } else {
                     textGrade.style.display = 'inline-block';
                     selectGrade.style.display = 'none';
-                    
                     finalInput.readOnly = false;
                     finalInput.style.backgroundColor = '#fafafa';
-                    finalInput.style.border = 'none';
-                    finalInput.style.borderTop = '2px solid #a0a0a0';
-                    finalInput.style.borderLeft = '2px solid #a0a0a0';
                     finalInput.style.color = 'black';
-                    finalInput.style.fontWeight = 'normal';
 
                     final = parseFloat(finalInput.value) || 0;
                     total = saei + final;
 
                     if (saeiInput.value || finalInput.value) {
                         let gradeText = "";
-                        //
                         if (total >= 90) { gradeText = "امتياز"; applyColorToCell(gradeCell, 90); }
                         else if (total >= 80) { gradeText = "جيد جداً"; applyColorToCell(gradeCell, 80); }
                         else if (total >= 70) { gradeText = "جيد"; }
@@ -318,61 +354,98 @@
                         else if (total >= 45) { gradeText = "مقبول بقرار"; applyColorToCell(gradeCell, 45); }
                         else { gradeText = "ضعيف"; applyColorToCell(gradeCell, 0); }
                         textGrade.innerText = gradeText;
+                        sub.currentGradeText = gradeText;
                     } else {
                         textGrade.innerText = "--";
+                        sub.currentGradeText = "--";
                     }
                 }
-
+                
+                sub.currentSaei = saeiInput.value ? saei : "-";
+                sub.currentFinal = finalInput.value ? final : "-";
+                
                 totalWeightedScore += (total * ectsVal);
             });
 
-            // 3. التحقق من الشروط وعرض المعدل كـ "كلمة"
             const warningDiv = document.getElementById('ects-warning');
-            const sumSpan = document.getElementById('current-ects-sum');
-            const finalGpaElement = document.getElementById('final-gpa');
-            const screenContainer = document.getElementById('screen-container');
-
+            const finalGpaElement = document.getElementById('final-gpa-word');
+            
             if (sumEcts !== 30 || !isEctsValid) {
-                // حالة الخطأ في الوحدات
                 warningDiv.style.display = 'block';
-                sumSpan.innerText = sumEcts;
-                
+                document.getElementById('current-ects-sum').innerText = sumEcts;
                 finalGpaElement.innerText = "خطأ في الوحدات";
                 finalGpaElement.style.color = "#d32f2f";
-                finalGpaElement.style.fontSize = "2rem";
-                screenContainer.style.backgroundColor = "#ffebee";
+                globalGpaNumber = 0;
+                globalGpaWord = "خطأ";
             } else {
-                // الحالة السليمة
                 warningDiv.style.display = 'none';
-                screenContainer.style.backgroundColor = "#f4fdf4";
+                globalGpaNumber = (totalWeightedScore / 30).toFixed(2);
                 
-                // حساب المعدل النهائي كنسبة مئوية من 100
-                const finalGpaNum = totalWeightedScore / 30; 
-                let finalWord = "--";
-                let finalColor = "#555";
-
-                // استبدال الرقم بالتقدير النهائي
                 if (totalWeightedScore > 0) {
-                    if (finalGpaNum >= 90) { finalWord = "امتياز"; finalColor = "#1b5e20"; }
-                    else if (finalGpaNum >= 80) { finalWord = "جيد جداً"; finalColor = "#2e7d32"; }
-                    else if (finalGpaNum >= 70) { finalWord = "جيد"; finalColor = "#333"; }
-                    else if (finalGpaNum >= 60) { finalWord = "متوسط"; finalColor = "#555"; }
-                    else if (finalGpaNum >= 50) { finalWord = "مقبول"; finalColor = "#777"; }
-                    else { finalWord = "ضعيف"; finalColor = "#d32f2f"; }
+                    if (globalGpaNumber >= 90) { globalGpaWord = "امتياز"; finalGpaElement.style.color = "#1b5e20"; }
+                    else if (globalGpaNumber >= 80) { globalGpaWord = "جيد جداً"; finalGpaElement.style.color = "#2e7d32"; }
+                    else if (globalGpaNumber >= 70) { globalGpaWord = "جيد"; finalGpaElement.style.color = "#333"; }
+                    else if (globalGpaNumber >= 60) { globalGpaWord = "متوسط"; finalGpaElement.style.color = "#555"; }
+                    else if (globalGpaNumber >= 50) { globalGpaWord = "مقبول"; finalGpaElement.style.color = "#777"; }
+                    else { globalGpaWord = "ضعيف"; finalGpaElement.style.color = "#d32f2f"; }
+                } else {
+                    globalGpaWord = "--";
                 }
-
-                finalGpaElement.innerText = finalWord;
-                finalGpaElement.style.color = finalColor;
-                finalGpaElement.style.fontSize = "3rem";
+                finalGpaElement.innerText = globalGpaWord;
             }
         }
 
-        // دالة مساعدة لتلوين الخلايا
         function applyColorToCell(cell, score) {
             if (score >= 90) cell.classList.add("grade-excellent");
             else if (score >= 80) cell.classList.add("grade-vgood");
             else if (score >= 45 && score < 50) cell.classList.add("grade-fx");
             else if (score < 45) cell.classList.add("grade-fail");
+        }
+
+        // --- دالة التصدير المُحدّثة لتدعم الحقول الفارغة ---
+        function generateTextFile() {
+            // سحب القيم، وإذا كانت فارغة أو مسافات فقط يتم استبدالها بـ "-"
+            const studentName = document.getElementById('student-name').value.trim() || "-";
+            const uni = document.getElementById('uni-name').value.trim() || "-";
+            const college = document.getElementById('college-name').value.trim() || "-";
+            const dept = document.getElementById('dept-name').value.trim() || "-";
+            const year = document.getElementById('academic-year').value.trim() || "-";
+            const stage = document.getElementById('stage-name').value.trim() || "-";
+            const semester = document.getElementById('semester-name').value.trim() || "-";
+            const isPredict = document.getElementById('predict-mode').checked;
+
+            // بناء النص
+            let content = `اسم الطالب: ${studentName}\r\n`;
+            content += `الجامعة: ${uni}\r\n`;
+            content += `الكلية: ${college}\r\n`;
+            content += `القسم: ${dept}\r\n`;
+            content += `السنة الدراسية: ${year} | المرحلة: ${stage} | الفصل: ${semester}\r\n`;
+            if (isPredict) content += `(ملاحظة: هذه النتيجة مبنية على وضع التنبؤ والتخطيط)\r\n`;
+            content += `--------------------------------------------------\r\n\r\n`;
+
+            subjects.forEach(sub => {
+                let ects = document.getElementById(`${sub.id}_ects`).value;
+                content += `${sub.name}\r\n`;
+                content += `عدد الوحدات: ${ects}\r\n`;
+                content += `السعي (من 50): ${sub.currentSaei}\r\n`;
+                content += `الامتحان النهائي: ${sub.currentFinal}\r\n`;
+                content += `التقدير: ${sub.currentGradeText}\r\n\r\n`;
+            });
+
+            content += `--------------------------------------------------\r\n`;
+            content += `التقدير العام: ${globalGpaWord}\r\n`;
+            content += `معدل الفصل (GPA): ${globalGpaNumber}\r\n`;
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            
+            // تحديد اسم الملف: إذا كان الاسم فارغاً يسميه "نتيجة_طالب.txt"
+            link.download = studentName !== "-" ? `نتيجة_${studentName.replace(/\s+/g, '_')}.txt` : `نتيجة_طالب.txt`; 
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         window.onload = mainUpdate;
