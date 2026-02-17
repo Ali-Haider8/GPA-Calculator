@@ -61,7 +61,17 @@ function setupEventListeners() {
             mainUpdate();
             saveToLocalStorage();
         }
+    })
+	// (أضف هذا الكود داخل دالة setupEventListeners الموجودة في ملف app.js)
+    
+    // أحداث النافذة المنبثقة (Modal)
+    document.getElementById('btn-gpa-info').addEventListener('click', openModal);
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+    // لإغلاق النافذة عند النقر في أي مكان فارغ خارجها
+    document.getElementById('gpa-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('gpa-modal')) closeModal();
     });
+	;
 
     document.getElementById('subjects-body').addEventListener('change', (e) => {
         if (e.target.tagName === 'SELECT') { mainUpdate(); saveToLocalStorage(); }
@@ -297,4 +307,22 @@ function generateTextFile() {
     link.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
     link.download = studentName !== "-" ? `نتيجة_${studentName.replace(/\s+/g, '_')}.txt` : `نتيجة_طالب.txt`; 
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+// --- دوال النافذة المنبثقة (Modal) ---
+function openModal() {
+    const modal = document.getElementById('gpa-modal');
+    modal.style.display = 'flex';
+    // مهلة بسيطة جداً للسماح بتفعيل تأثير الانتقال (Transition) في CSS
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+function closeModal() {
+    const modal = document.getElementById('gpa-modal');
+    modal.classList.remove('show');
+    // انتظار انتهاء تأثير الإخفاء قبل إزالة العنصر فعلياً
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }
