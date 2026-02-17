@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    
     <link rel="stylesheet" href="css/style.css">
-	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script>
-    window.MathJax = {
-        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-    };
-</script>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
 </head>
 <body>
 
@@ -22,46 +27,73 @@
         </div>
 
         <div class="warning-box" id="ects-warning">
-            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30!
+            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30 وحدة بالضبط!
         </div>
 
         <div class="controls-container">
             <label class="controls predict">
-                <input type="checkbox" id="predict-mode"> وضع التنبؤ: حساب المطلوب بالفاينل
+                <input type="checkbox" id="predict-mode"> وضع التنبؤ: حساب المطلوب بالفاينل بناءً على التقدير المستهدف
             </label>
             <label class="controls edit-ects">
-                <input type="checkbox" id="edit-ects-mode"> تعديل عدد الوحدات (ECTS)
+                <input type="checkbox" id="edit-ects-mode"> تعديل عدد الوحدات لكل مادة (ECTS)
             </label>
             <label class="controls edit-names">
                 <input type="checkbox" id="edit-names-mode"> تعديل أسماء المواد
             </label>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>المادة</th><th>الوحدات</th><th>السعي (50)</th><th id="final-header">النهائي (50)</th><th>التقدير</th>
-                </tr>
-            </thead>
-            <tbody id="subjects-body"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المادة</th>
+                        <th>الوحدات</th>
+                        <th>السعي (50)</th>
+                        <th id="final-header">النهائي (50)</th>
+                        <th>التقدير</th>
+                    </tr>
+                </thead>
+                <tbody id="subjects-body"></tbody>
+            </table>
+        </div>
 
         <div class="collapsible-container">
             <button class="toggle-tab-btn" id="btn-toggle-save">
-                <span>إظهار نافذة الحفظ والتصدير</span><span id="tab-icon">▼</span>
+                <span>إظهار نافذة الحفظ والتصدير</span>
+                <span id="tab-icon">▼</span>
             </button>
 
             <div class="footer-section" id="save-window-content">
                 <div class="info-grid">
-                    <div class="full-width"><label>اسم الطالب: <input type="text" id="student-name" placeholder="اختياري..."></label></div>
-                    <label>الجامعة: <input type="text" id="uni-name" value="جامعة الكوفة"></label>
-                    <label>الكلية: <input type="text" id="college-name" value="كلية علوم الحاسوب والرياضيات"></label>
-                    <label>القسم: <select id="dept-name"></select></label>
-                    <label>السنة الدراسية: <select id="academic-year"></select></label>
-                    <label>المرحلة: <select id="stage-name"></select></label>
-                    <label>الكورس: <select id="semester-name"></select></label>
+                    <div class="full-width">
+                        <label>اسم الطالب:
+                            <input type="text" id="student-name" placeholder="اختياري...">
+                        </label>
+                    </div>
+                    
+                    <label>الجامعة:
+                        <input type="text" id="uni-name" value="جامعة الكوفة">
+                    </label>
+                    <label>الكلية:
+                        <input type="text" id="college-name" value="كلية علوم الحاسوب والرياضيات">
+                    </label>
+                    
+                    <label>القسم:
+                        <select id="dept-name"></select>
+                    </label>
+                    <label>السنة الدراسية:
+                        <select id="academic-year"></select>
+                    </label>
+
+                    <label>المرحلة:
+                        <select id="stage-name"></select>
+                    </label>
+                    <label>الكورس (الفصل):
+                        <select id="semester-name"></select>
+                    </label>
                 </div>
-                <button class="btn-success" id="btn-export">حفظ النتائج (.txt)</button>
+                
+                <button class="btn-success" id="btn-export">حفظ النتائج وتصدير ملف (.txt)</button>
             </div>
         </div>
     </div>
@@ -72,41 +104,39 @@
     </div>
 
     <div class="modal-overlay" id="gpa-modal">
-    <div class="modal-content">
-    <span class="close-modal" id="btn-close-modal">&times;</span>
-    <h2>ما هو معدل الـ GPA؟ وما أهميته؟</h2>
-    <p>معدل الـ <strong>GPA</strong> (Grade Point Average) هو المقياس العالمي لتقييم أداء الطالب الأكاديمي، ويعتبر المعيار الأساسي في <strong>مسار بولونيا</strong>.</p>
-    
-    <div class="modal-sub-section">
-        <h3>أهمية المعدل:</h3>
-        <ul>
-            <li><strong>احتساب الأوائل:</strong> المعيار الرئيسي لتحديد ترتيب التفوق على مستوى القسم.</li>
-            <li><strong>الدراسات العليا:</strong> شرط أساسي للقبول في برامج الماجستير والدكتوراه.</li>
-        </ul>
-    </div>
+        <div class="modal-content">
+            <span class="close-modal" id="btn-close-modal">&times;</span>
+            <h2>ما هو معدل الـ GPA؟ وما أهميته؟</h2>
+            <p>معدل الـ <strong>GPA</strong> (Grade Point Average) هو المقياس العالمي لتقييم أداء الطالب الأكاديمي في <strong>مسار بولونيا</strong>.</p>
+            
+            <div class="modal-sub-section">
+                <h3>أهمية المعدل:</h3>
+                <ul>
+                    <li><strong>احتساب الأوائل:</strong> هو المعيار الرئيسي لتحديد ترتيب التفوق في القسم.</li>
+                    <li><strong>الدراسات العليا:</strong> شرط أساسي للقبول في برامج الماجستير والدكتوراه.</li>
+                </ul>
+            </div>
 
-    <hr>
+            <hr>
 
-    <div class="modal-sub-section calculation-method">
-        <h3>كيف يُحتسب المعدل؟</h3>
-        <p>حسب تعليمات وزارة التعليم العالي، يُحسب معدل الفصل من خلال جمع ناتج ضرب درجة كل مادة في عدد وحداتها (ECTS)، ثم قسمة الناتج على مجموع الوحدات الكلي للفصل.</p>
-        
-        <div style="text-align: center; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin: 15px 0;">
-            <strong style="color: #2e7d32;">المعادلة الرسمية:</strong><br><br>
-            $$GPA = \frac{\sum (ECTS \times Grade)}{Total \ ECTS}$$
+            <div class="modal-sub-section calculation-method">
+                <h3>كيف يُحتسب المعدل؟</h3>
+                <p>يُحسب معدل الفصل بجمع ناتج ضرب درجة كل مادة في وحداتها (ECTS)، ثم قسمة المجموع على عدد الوحدات الكلي للفصل.</p>
+                
+                <div class="math-box">
+                    <strong style="color: #2e7d32;">المعادلة الرسمية:</strong><br><br>
+                    $$GPA = \frac{\sum (ECTS \times Grade)}{Total \ ECTS}$$
+                </div>
+
+                <p><strong>مثال توضيحي (من الوثيقة الرسمية):</strong><br>
+                إذا كان مجموع نواتج ضرب (الدرجة × الوحدات) يساوي <strong>2490</strong>، ومجموع الوحدات للفصل هو <strong>30</strong>، فإن:</p>
+                
+                <div style="text-align: center; color: #1976d2; font-weight: bold; font-size: 1.2rem;">
+                    $$GPA = 2490 \div 30 = 83\%$$
+                </div>
+            </div>
         </div>
-
-        <p><strong>مثال توضيحي (من الوثيقة الرسمية):</strong><br>
-        إذا كان مجموع نواتج ضرب (الدرجة × الوحدات) يساوي <strong>2490</strong>، ومجموع الوحدات للفصل هو <strong>30</strong>، فإن:</p>
-        
-        <div style="text-align: center; color: #1976d2; font-weight: bold; font-size: 1.2rem;">
-            $$GPA = 2490 \div 30 = 83\%$$
-        </div>
     </div>
-</div>
-	
-</div>
-
 
     <script src="js/config.js"></script>
     <script src="js/app.js"></script>
