@@ -29,7 +29,6 @@
             max-width: 900px;
         }
 
-        /* الشاشة العلوية */
         .gpa-screen {
             background-color: #f4fdf4;
             border: 3px solid #a0a0a0;
@@ -50,6 +49,7 @@
         .controls { padding: 12px; border-radius: 5px; font-weight: bold; display: flex; align-items: center; cursor: pointer; border: 1px solid; }
         .controls.predict { background-color: #e3f2fd; border-color: #90caf9; color: #1565c0; }
         .controls.edit-ects { background-color: #f3e5f5; border-color: #ce93d8; color: #6a1b9a; }
+        .controls.edit-names { background-color: #fff3e0; border-color: #ffb74d; color: #e65100; } /* تصميم زر الأسماء الجديد */
         .controls input[type="checkbox"] { width: 20px; height: 20px; margin-left: 10px; cursor: pointer; }
 
         .warning-box { background-color: #d32f2f; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; }
@@ -63,8 +63,12 @@
         input[type="number"]:focus { background-color: #e8f5e9; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-        .ects-input { width: 50px; border: none !important; background: transparent !important; font-weight: bold; color: #333; cursor: default; }
-        .ects-input.editable { border: 1px solid #aaa !important; background-color: #fffde7 !important; cursor: text; }
+        /* تصميم حقول الأسماء والوحدات */
+        .ects-input, .name-input { border: none !important; background: transparent !important; font-weight: bold; color: #333; cursor: default; text-align: center; font-family: inherit; font-size: 1rem; width: 100%; box-sizing: border-box; }
+        .ects-input { width: 50px; }
+        .name-input { min-width: 140px; }
+        
+        .ects-input.editable, .name-input.editable { border: 1px solid #aaa !important; background-color: #fffde7 !important; cursor: text; padding: 5px; }
         .ects-input.error { border: 2px solid red !important; color: red !important; }
         
         select { padding: 8px; font-size: 1rem; font-family: inherit; border: 1px solid #ccc; border-radius: 4px; outline: none; background-color: #fff; }
@@ -74,89 +78,20 @@
         .grade-fx { background-color: #fff9c4; color: #f57f17; font-weight: bold; }
         .grade-fail { background-color: #ffcdd2; color: #b71c1c; font-weight: bold; }
 
-        /* --- تصميم القائمة المنسدلة لمعلومات الحفظ --- */
-        .collapsible-container {
-            border: 1px solid #c0c0c0;
-            border-radius: 5px;
-            background-color: #e6e6e6;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .toggle-tab-btn {
-            width: 100%;
-            background-color: #cfd8dc;
-            color: #37474f;
-            border: none;
-            padding: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            font-family: inherit;
-            text-align: right;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            justify-content: space-between;
-        }
-
+        .collapsible-container { border: 1px solid #c0c0c0; border-radius: 5px; background-color: #e6e6e6; overflow: hidden; margin-top: 10px; }
+        .toggle-tab-btn { width: 100%; background-color: #cfd8dc; color: #37474f; border: none; padding: 15px; font-size: 1.1rem; font-weight: bold; font-family: inherit; text-align: right; cursor: pointer; transition: background 0.3s; display: flex; justify-content: space-between; }
         .toggle-tab-btn:hover { background-color: #b0bec5; }
 
-        /* النافذة المخفية (تُظهر بواسطة جافاسكربت) */
-        .footer-section {
-            padding: 20px;
-            display: none; /* مخفي افتراضياً */
-            flex-direction: column;
-            gap: 20px;
-            border-top: 1px solid #c0c0c0;
-        }
-
-        /* عندما يتم فتح النافذة */
+        .footer-section { padding: 20px; display: none; flex-direction: column; gap: 20px; border-top: 1px solid #c0c0c0; }
         .footer-section.show { display: flex; }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .info-grid .full-width { grid-column: span 2; display: flex; flex-direction: column; }
-        
-        .info-grid label {
-            display: flex;
-            flex-direction: column;
-            font-size: 0.95rem;
-            color: #444;
-            font-weight: bold;
-        }
+        .info-grid label { display: flex; flex-direction: column; font-size: 0.95rem; color: #444; font-weight: bold; }
+        .info-grid input[type="text"], .info-grid select { padding: 8px; margin-top: 5px; border: 1px solid #aaa; border-radius: 4px; font-family: inherit; font-size: 1rem; }
 
-        .info-grid input[type="text"], .info-grid select {
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #aaa;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        /* زر الحفظ السفلي */
-        .btn-success {
-            width: 100%;
-            background-color: #2e7d32;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.2rem;
-            font-family: inherit;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-            transition: background 0.3s;
-        }
-
+        .btn-success { width: 100%; background-color: #2e7d32; color: white; border: none; border-radius: 4px; padding: 15px; cursor: pointer; font-weight: bold; font-size: 1.2rem; font-family: inherit; box-shadow: 0 3px 5px rgba(0,0,0,0.2); transition: background 0.3s; }
         .btn-success:hover { background-color: #1b5e20; }
 
-        /* التجاوب مع الشاشات الصغيرة */
         @media (max-width: 768px) {
             .info-grid { grid-template-columns: 1fr; }
             .info-grid .full-width { grid-column: span 1; }
@@ -185,6 +120,10 @@
                 <input type="checkbox" id="edit-ects-mode" onchange="toggleEctsEdit()">
                 تعديل عدد الوحدات لكل مادة (ECTS)
             </label>
+            <label class="controls edit-names">
+                <input type="checkbox" id="edit-names-mode" onchange="toggleNamesEdit()">
+                تعديل أسماء المواد
+            </label>
         </div>
 
         <table>
@@ -203,7 +142,7 @@
 
         <div class="collapsible-container">
             <button class="toggle-tab-btn" id="toggle-tab-btn" onclick="toggleSaveWindow()">
-                <span>إظهار نافذة الحفظ</span>
+                <span>إظهار نافذة الحفظ والتصدير</span>
                 <span id="tab-icon">▼</span>
             </button>
 
@@ -223,8 +162,9 @@
                     </label>
                     
                     <label>القسم:
-                        <select id="dept-name">
+                        <select id="dept-name" onchange="autoUpdateSubjectNames()">
                             <option value="علوم الحاسوب" selected>علوم الحاسوب</option>
+                            <option value="الذكاء الاصطناعي">الذكاء الاصطناعي</option>
                             <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
                             <option value="شبكات الحاسوب">شبكات الحاسوب</option>
                             <option value="الرياضيات">الرياضيات</option>
@@ -250,7 +190,7 @@
                         </select>
                     </label>
                     <label>الكورس (الفصل):
-                        <select id="semester-name">
+                        <select id="semester-name" onchange="autoUpdateSubjectNames()">
                             <option value="الأول" selected>الأول</option>
                             <option value="الثاني">الثاني</option>
                             <option value="">- فارغ -</option>
@@ -266,12 +206,12 @@
 
     <script>
         const subjects = [
-            { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
-            { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
-            { id: 'math', name: 'الرياضيات', ects: 6 },
-            { id: 'arabic', name: 'لغة عربية', ects: 3 },
-            { id: 'english', name: 'أساسيات اللغة الإنجليزية', ects: 4 },
-            { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
+            { id: 'prog', originalName: 'اساسيات البرمجة', ects: 7 },
+            { id: 'arch', originalName: 'تركيب الحاسوب', ects: 5 },
+            { id: 'math', originalName: 'الرياضيات', ects: 6 },
+            { id: 'arabic', originalName: 'لغة عربية', ects: 3 },
+            { id: 'english', originalName: 'أساسيات اللغة الإنجليزية', ects: 4 },
+            { id: 'skills', originalName: 'مهارات الحاسوب', ects: 5 }
         ];
 
         let globalGpaNumber = 0;
@@ -279,10 +219,11 @@
 
         const tbody = document.getElementById('subjects-body');
 
-        subjects.forEach(sub => {
+        // بناء الجدول واستبدال اسم المادة بحقل إدخال
+        subjects.forEach((sub, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="font-weight:bold; color:#333;">${sub.name}</td>
+                <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.originalName}" readonly></td>
                 <td><input type="number" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8" readonly oninput="mainUpdate()"></td>
                 <td><input type="number" id="${sub.id}_saei" placeholder="-" oninput="mainUpdate()"></td>
                 <td><input type="number" id="${sub.id}_final" placeholder="-" oninput="mainUpdate()"></td>
@@ -300,18 +241,50 @@
             tbody.appendChild(tr);
         });
 
-        // --- دالة فتح/إغلاق نافذة الحفظ ---
+        // --- الدالة الجديدة: التغيير التلقائي لأسماء المواد ---
+        function autoUpdateSubjectNames() {
+            const dept = document.getElementById('dept-name').value;
+            const semester = document.getElementById('semester-name').value;
+            
+            subjects.forEach((sub, index) => {
+                const nameInput = document.getElementById(`${sub.id}_name`);
+                
+                // إذا كان القسم علوم حاسوب والكورس الأول، ترجع الأسماء الأصلية
+                if (dept === 'علوم الحاسوب' && semester === 'الأول') {
+                    nameInput.value = sub.originalName;
+                } else {
+                    // أي قسم آخر (كالرياضيات أو الذكاء الاصطناعي) أو كورس ثاني، تتغير افتراضياً
+                    nameInput.value = `مادة ${index + 1}`;
+                }
+            });
+        }
+
+        // --- دالة تفعيل/إلغاء التعديل اليدوي للأسماء ---
+        function toggleNamesEdit() {
+            const isEditMode = document.getElementById('edit-names-mode').checked;
+            subjects.forEach(sub => {
+                const input = document.getElementById(`${sub.id}_name`);
+                if (isEditMode) { 
+                    input.readOnly = false; 
+                    input.classList.add('editable'); 
+                } else { 
+                    input.readOnly = true; 
+                    input.classList.remove('editable'); 
+                }
+            });
+        }
+
         function toggleSaveWindow() {
             const content = document.getElementById('save-window-content');
             const icon = document.getElementById('tab-icon');
             
             if (content.classList.contains('show')) {
                 content.classList.remove('show');
-                icon.innerText = '▼'; // سهم للأسفل
+                icon.innerText = '▼';
             } else {
                 content.classList.add('show');
-                icon.innerText = '▲'; // سهم للأعلى
-                content.scrollIntoView({ behavior: 'smooth', block: 'end' }); // تمرير سلس للأسفل
+                icon.innerText = '▲';
+                content.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         }
 
@@ -461,7 +434,10 @@
 
             subjects.forEach(sub => {
                 let ects = document.getElementById(`${sub.id}_ects`).value;
-                content += `${sub.name}\r\n`;
+                // سحب الاسم الحالي (سواء كان المبرمج آلياً أو المعدل يدوياً)
+                let currentName = document.getElementById(`${sub.id}_name`).value; 
+                
+                content += `${currentName}\r\n`;
                 content += `عدد الوحدات: ${ects}\r\n`;
                 content += `السعي (من 50): ${sub.currentSaei}\r\n`;
                 content += `الامتحان النهائي: ${sub.currentFinal}\r\n`;
