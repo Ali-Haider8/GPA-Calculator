@@ -74,20 +74,46 @@
         .grade-fx { background-color: #fff9c4; color: #f57f17; font-weight: bold; }
         .grade-fail { background-color: #ffcdd2; color: #b71c1c; font-weight: bold; }
 
-        /* --- تصميم قسم المعلومات السفلية (الجديد) --- */
-        .footer-section {
-            background-color: #e6e6e6;
-            padding: 20px;
-            border-radius: 5px;
+        /* --- تصميم القائمة المنسدلة لمعلومات الحفظ --- */
+        .collapsible-container {
             border: 1px solid #c0c0c0;
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            align-items: stretch;
+            border-radius: 5px;
+            background-color: #e6e6e6;
+            overflow: hidden;
+            margin-top: 10px;
         }
 
+        .toggle-tab-btn {
+            width: 100%;
+            background-color: #cfd8dc;
+            color: #37474f;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: inherit;
+            text-align: right;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toggle-tab-btn:hover { background-color: #b0bec5; }
+
+        /* النافذة المخفية (تُظهر بواسطة جافاسكربت) */
+        .footer-section {
+            padding: 20px;
+            display: none; /* مخفي افتراضياً */
+            flex-direction: column;
+            gap: 20px;
+            border-top: 1px solid #c0c0c0;
+        }
+
+        /* عندما يتم فتح النافذة */
+        .footer-section.show { display: flex; }
+
         .info-grid {
-            flex: 1;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
@@ -112,19 +138,14 @@
             font-size: 1rem;
         }
 
-        /* زر الحفظ الجانبي */
-        .save-action {
-            width: 160px;
-            display: flex;
-            align-items: stretch;
-        }
-
+        /* زر الحفظ السفلي */
         .btn-success {
             width: 100%;
             background-color: #2e7d32;
             color: white;
             border: none;
             border-radius: 4px;
+            padding: 15px;
             cursor: pointer;
             font-weight: bold;
             font-size: 1.2rem;
@@ -137,8 +158,6 @@
 
         /* التجاوب مع الشاشات الصغيرة */
         @media (max-width: 768px) {
-            .footer-section { flex-direction: column; }
-            .save-action { width: 100%; height: 60px; }
             .info-grid { grid-template-columns: 1fr; }
             .info-grid .full-width { grid-column: span 1; }
         }
@@ -182,59 +201,64 @@
                 </tbody>
         </table>
 
-        <div class="footer-section">
-            <div class="info-grid">
-                <div class="full-width">
-                    <label>اسم الطالب:
-                        <input type="text" id="student-name" placeholder="اختياري...">
+        <div class="collapsible-container">
+            <button class="toggle-tab-btn" id="toggle-tab-btn" onclick="toggleSaveWindow()">
+                <span>إظهار نافذة الحفظ</span>
+                <span id="tab-icon">▼</span>
+            </button>
+
+            <div class="footer-section" id="save-window-content">
+                <div class="info-grid">
+                    <div class="full-width">
+                        <label>اسم الطالب:
+                            <input type="text" id="student-name" placeholder="اختياري...">
+                        </label>
+                    </div>
+                    
+                    <label>الجامعة:
+                        <input type="text" id="uni-name" placeholder="مثال: جامعة الكوفة" value="جامعة الكوفة">
+                    </label>
+                    <label>الكلية:
+                        <input type="text" id="college-name" placeholder="مثال: كلية علوم الحاسوب" value="كلية علوم الحاسوب والرياضيات">
+                    </label>
+                    
+                    <label>القسم:
+                        <select id="dept-name">
+                            <option value="علوم الحاسوب" selected>علوم الحاسوب</option>
+                            <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
+                            <option value="شبكات الحاسوب">شبكات الحاسوب</option>
+                            <option value="الرياضيات">الرياضيات</option>
+                            <option value="">- فارغ -</option>
+                        </select>
+                    </label>
+                    <label>السنة الدراسية:
+                        <select id="academic-year">
+                            <option value="2025-2026" selected>2025-2026</option>
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2023-2024">2023-2024</option>
+                            <option value="">- فارغ -</option>
+                        </select>
+                    </label>
+
+                    <label>المرحلة:
+                        <select id="stage-name">
+                            <option value="الأولى" selected>الأولى</option>
+                            <option value="الثانية">الثانية</option>
+                            <option value="الثالثة">الثالثة</option>
+                            <option value="الرابعة">الرابعة</option>
+                            <option value="">- فارغ -</option>
+                        </select>
+                    </label>
+                    <label>الكورس (الفصل):
+                        <select id="semester-name">
+                            <option value="الأول" selected>الأول</option>
+                            <option value="الثاني">الثاني</option>
+                            <option value="">- فارغ -</option>
+                        </select>
                     </label>
                 </div>
                 
-                <label>الجامعة:
-                    <input type="text" id="uni-name" placeholder="مثال: جامعة الكوفة" value="جامعة الكوفة">
-                </label>
-                <label>الكلية:
-                    <input type="text" id="college-name" placeholder="مثال: كلية علوم الحاسوب" value="كلية علوم الحاسوب والرياضيات">
-                </label>
-                
-                <label>القسم:
-                    <select id="dept-name">
-                        <option value="علوم الحاسوب" selected>علوم الحاسوب</option>
-                        <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
-                        <option value="شبكات الحاسوب">شبكات الحاسوب</option>
-                        <option value="الرياضيات">الرياضيات</option>
-                        <option value="">- فارغ -</option>
-                    </select>
-                </label>
-                <label>السنة الدراسية:
-                    <select id="academic-year">
-                        <option value="2025-2026" selected>2025-2026</option>
-                        <option value="2024-2025">2024-2025</option>
-                        <option value="2023-2024">2023-2024</option>
-                        <option value="">- فارغ -</option>
-                    </select>
-                </label>
-
-                <label>المرحلة:
-                    <select id="stage-name">
-                        <option value="الأولى" selected>الأولى</option>
-                        <option value="الثانية">الثانية</option>
-                        <option value="الثالثة">الثالثة</option>
-                        <option value="الرابعة">الرابعة</option>
-                        <option value="">- فارغ -</option>
-                    </select>
-                </label>
-                <label>الكورس (الفصل):
-                    <select id="semester-name">
-                        <option value="الأول" selected>الأول</option>
-                        <option value="الثاني">الثاني</option>
-                        <option value="">- فارغ -</option>
-                    </select>
-                </label>
-            </div>
-            
-            <div class="save-action">
-                <button class="btn-success" onclick="generateTextFile()">حفظ النتائج<br>(.txt)</button>
+                <button class="btn-success" onclick="generateTextFile()">حفظ النتائج (.txt)</button>
             </div>
         </div>
 
@@ -275,6 +299,21 @@
             `;
             tbody.appendChild(tr);
         });
+
+        // --- دالة فتح/إغلاق نافذة الحفظ ---
+        function toggleSaveWindow() {
+            const content = document.getElementById('save-window-content');
+            const icon = document.getElementById('tab-icon');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.innerText = '▼'; // سهم للأسفل
+            } else {
+                content.classList.add('show');
+                icon.innerText = '▲'; // سهم للأعلى
+                content.scrollIntoView({ behavior: 'smooth', block: 'end' }); // تمرير سلس للأسفل
+            }
+        }
 
         function toggleEctsEdit() {
             const isEditMode = document.getElementById('edit-ects-mode').checked;
@@ -402,9 +441,7 @@
             else if (score < 45) cell.classList.add("grade-fail");
         }
 
-        // --- دالة التصدير المُحدّثة لتدعم الحقول الفارغة ---
         function generateTextFile() {
-            // سحب القيم، وإذا كانت فارغة أو مسافات فقط يتم استبدالها بـ "-"
             const studentName = document.getElementById('student-name').value.trim() || "-";
             const uni = document.getElementById('uni-name').value.trim() || "-";
             const college = document.getElementById('college-name').value.trim() || "-";
@@ -414,7 +451,6 @@
             const semester = document.getElementById('semester-name').value.trim() || "-";
             const isPredict = document.getElementById('predict-mode').checked;
 
-            // بناء النص
             let content = `اسم الطالب: ${studentName}\r\n`;
             content += `الجامعة: ${uni}\r\n`;
             content += `الكلية: ${college}\r\n`;
@@ -439,8 +475,6 @@
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            
-            // تحديد اسم الملف: إذا كان الاسم فارغاً يسميه "نتيجة_طالب.txt"
             link.download = studentName !== "-" ? `نتيجة_${studentName.replace(/\s+/g, '_')}.txt` : `نتيجة_طالب.txt`; 
             
             document.body.appendChild(link);
