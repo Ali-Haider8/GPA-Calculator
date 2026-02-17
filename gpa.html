@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    <style>
+        /* إعدادات الخط والخلفية العامة */
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: #607d8b; /* خلفية داكنة لإبراز التطبيق */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* تصميم حاوية التطبيق (تشبه نافذة الحاسبة الكلاسيكية) */
+        .app-container {
+            background-color: #f0f0f0;
+            border-top: 2px solid #ffffff;
+            border-left: 2px solid #ffffff;
+            border-right: 2px solid #a0a0a0;
+            border-bottom: 2px solid #a0a0a0;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            width: 95%;
+            max-width: 750px;
+        }
+
+        /* شاشة عرض المعدل العلوية */
+        .gpa-screen {
+            background-color: #f4fdf4; /* لون مائل للأخضر الفاتح جداً يشبه شاشات LCD */
+            border-top: 3px solid #a0a0a0;
+            border-left: 3px solid #a0a0a0;
+            border-right: 3px solid #ffffff;
+            border-bottom: 3px solid #ffffff;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gpa-label {
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .gpa-value {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #2e7d32;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* تصميم الجدول */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        th, td {
+            border: 1px solid #c0c0c0;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50; /* الأخضر المعتمد في جداولك */
+            color: white;
+            font-size: 1.1rem;
+            border: 1px solid #388E3C;
+        }
+
+        /* تصميم حقول الإدخال */
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            border-top: 2px solid #a0a0a0;
+            border-left: 2px solid #a0a0a0;
+            border-right: 2px solid #ffffff;
+            border-bottom: 2px solid #ffffff;
+            background-color: #fafafa;
+            text-align: center;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            background-color: #e8f5e9;
+        }
+
+        /* إخفاء أسهم الأرقام ليكون الشكل أنظف */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* التنسيق الشرطي للتقديرات (الألوان) */
+        .grade-excellent { background-color: #c8e6c9; color: #1b5e20; font-weight: bold; }
+        .grade-vgood { background-color: #e8f5e9; color: #2e7d32; }
+        .grade-fx { background-color: #fff9c4; color: #f57f17; font-weight: bold; }
+        .grade-fail { background-color: #ffcdd2; color: #b71c1c; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="gpa-screen">
+            <div class="gpa-label">معدل الفصل المتوقع (GPA)</div>
+            <div class="gpa-value" id="final-gpa">0.00</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم المادة</th>
+                    <th>الوحدات</th>
+                    <th>السعي (50)</th>
+                    <th>النهائي (50)</th>
+                    <th>التقدير</th>
+                </tr>
+            </thead>
+            <tbody id="subjects-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // قاعدة البيانات الخاصة بمواد قسمك ووحداتها
+        const subjects = [
+            { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
+            { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
+            { id: 'math', name: 'الرياضيات', ects: 6 },
+            { id: 'arabic', name: 'لغة عربية', ects: 3 },
+            { id: 'english', name: 'أساسيات اللغة الإنجليزية', ects: 4 },
+            { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
+        ];
+
+        const tbody = document.getElementById('subjects-body');
+
+        // دالة لإنشاء الجدول برمجياً
+        subjects.forEach(sub => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold; color:#333;">${sub.name}</td>
+                <td>${sub.ects}</td>
+                <td><input type="number" id="${sub.id}_saei" placeholder="-" oninput="calculateGPA()"></td>
+                <td><input type="number" id="${sub.id}_final" placeholder="-" oninput="calculateGPA()"></td>
+                <td id="${sub.id}_grade">--</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // دالة حساب المعدل والتقدير
+        function calculateGPA() {
+            let totalWeightedScore = 0;
+            const totalECTS = 30; // المجموع الكلي للوحدات
+
+            subjects.forEach(sub => {
+                // جلب القيم من الحقول
+                const saeiInput = document.getElementById(`${sub.id}_saei`).value;
+                const finalInput = document.getElementById(`${sub.id}_final`).value;
+
+                // تحويل النص إلى رقم، وإذا كان الحقل فارغاً يعتبر 0
+                const saei = saeiInput ? parseFloat(saeiInput) : 0;
+                const final = finalInput ? parseFloat(finalInput) : 0;
+                const total = saei + final;
+
+                const gradeCell = document.getElementById(`${sub.id}_grade`);
+                let gradeText = "--";
+                
+                // إعادة تعيين لون الخلية
+                gradeCell.className = ""; 
+
+                // حساب التقدير وتلوين الخلية بناءً على الجدول الرسمي
+                if (saeiInput || finalInput) {
+                    if (total >= 90) { gradeText = "امتياز"; gradeCell.classList.add("grade-excellent"); }
+                    else if (total >= 80) { gradeText = "جيد جداً"; gradeCell.classList.add("grade-vgood"); }
+                    else if (total >= 70) gradeText = "جيد";
+                    else if (total >= 60) gradeText = "متوسط";
+                    else if (total >= 50) gradeText = "مقبول";
+                    else if (total >= 45) { gradeText = "مقبول بقرار"; gradeCell.classList.add("grade-fx"); }
+                    else { gradeText = "ضعيف"; gradeCell.classList.add("grade-fail"); }
+                }
+
+                gradeCell.innerText = gradeText;
+                
+                // جمع النقاط لضربها في الوزن (الوحدات)
+                totalWeightedScore += (total * sub.ects);
+            });
+
+            // حساب المعدل النهائي وعرضه
+            const finalGpa = totalWeightedScore / totalECTS;
+            document.getElementById('final-gpa').innerText = finalGpa.toFixed(2);
+        }
+    </script>
+</body>
+</html>
