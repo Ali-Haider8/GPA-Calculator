@@ -3,41 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    <title>حاسبة ومُنتبئ المعدل الفصلي</title>
     <style>
-        /* إعدادات الخط والخلفية العامة */
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            background-color: #607d8b; /* خلفية داكنة لإبراز التطبيق */
+            background-color: #455a64; 
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* تصميم حاوية التطبيق (تشبه نافذة الحاسبة الكلاسيكية) */
         .app-container {
             background-color: #f0f0f0;
             border-top: 2px solid #ffffff;
             border-left: 2px solid #ffffff;
             border-right: 2px solid #a0a0a0;
             border-bottom: 2px solid #a0a0a0;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
-            width: 95%;
-            max-width: 750px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 5px 5px 20px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 800px;
         }
 
-        /* شاشة عرض المعدل العلوية */
         .gpa-screen {
-            background-color: #f4fdf4; /* لون مائل للأخضر الفاتح جداً يشبه شاشات LCD */
+            background-color: #f4fdf4;
             border-top: 3px solid #a0a0a0;
             border-left: 3px solid #a0a0a0;
             border-right: 3px solid #ffffff;
             border-bottom: 3px solid #ffffff;
-            height: 90px;
+            height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -45,20 +44,30 @@
             margin-bottom: 20px;
         }
 
-        .gpa-label {
-            font-size: 1.1rem;
-            color: #555;
+        .gpa-label { font-size: 1.1rem; color: #555; font-weight: bold; }
+        .gpa-value { font-size: 3rem; font-weight: bold; color: #2e7d32; }
+
+        /* منطقة أدوات التحكم */
+        .controls {
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
             font-weight: bold;
+            color: #1565c0;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
         }
 
-        .gpa-value {
-            font-size: 2.8rem;
-            font-weight: bold;
-            color: #2e7d32;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        .controls input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            cursor: pointer;
         }
 
-        /* تصميم الجدول */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -67,20 +76,23 @@
 
         th, td {
             border: 1px solid #c0c0c0;
-            padding: 12px 8px;
+            padding: 10px 8px;
             text-align: center;
         }
 
         th {
-            background-color: #4CAF50; /* الأخضر المعتمد في جداولك */
+            background-color: #4CAF50;
             color: white;
             font-size: 1.1rem;
             border: 1px solid #388E3C;
+            transition: background-color 0.3s;
         }
 
-        /* تصميم حقول الإدخال */
+        /* تغيير لون العنوان عند تفعيل وضع التنبؤ */
+        th.predict-active { background-color: #f57c00; border-color: #ef6c00; }
+
         input[type="number"] {
-            width: 60px;
+            width: 65px;
             padding: 8px;
             border-top: 2px solid #a0a0a0;
             border-left: 2px solid #a0a0a0;
@@ -88,37 +100,44 @@
             border-bottom: 2px solid #ffffff;
             background-color: #fafafa;
             text-align: center;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="number"]:focus { background-color: #e8f5e9; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* تصميم القائمة المنسدلة */
+        select {
+            padding: 6px;
             font-size: 1rem;
             font-family: inherit;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
             outline: none;
         }
 
-        input[type="number"]:focus {
-            background-color: #e8f5e9;
-        }
-
-        /* إخفاء أسهم الأرقام ليكون الشكل أنظف */
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* التنسيق الشرطي للتقديرات (الألوان) */
         .grade-excellent { background-color: #c8e6c9; color: #1b5e20; font-weight: bold; }
         .grade-vgood { background-color: #e8f5e9; color: #2e7d32; }
         .grade-fx { background-color: #fff9c4; color: #f57f17; font-weight: bold; }
         .grade-fail { background-color: #ffcdd2; color: #b71c1c; font-weight: bold; }
-
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <div class="gpa-screen">
-            <div class="gpa-label">معدل الفصل المتوقع (GPA)</div>
+            <div class="gpa-label">المعدل الفصلي (GPA)</div>
             <div class="gpa-value" id="final-gpa">0.00</div>
         </div>
+
+        <label class="controls">
+            <input type="checkbox" id="predict-mode" onchange="mainUpdate()">
+            لم امتحن الفاينل بعد (حساب الدرجة المطلوبة بناءً على التقدير المستهدف)
+        </label>
 
         <table>
             <thead>
@@ -126,7 +145,7 @@
                     <th>اسم المادة</th>
                     <th>الوحدات</th>
                     <th>السعي (50)</th>
-                    <th>النهائي (50)</th>
+                    <th id="final-header">النهائي (50)</th>
                     <th>التقدير</th>
                 </tr>
             </thead>
@@ -136,7 +155,7 @@
     </div>
 
     <script>
-        // قاعدة البيانات الخاصة بمواد قسمك ووحداتها
+        // بيانات المواد بناءً على سجل جامعة الكوفة
         const subjects = [
             { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
             { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
@@ -148,61 +167,142 @@
 
         const tbody = document.getElementById('subjects-body');
 
-        // دالة لإنشاء الجدول برمجياً
+        // بناء الجدول
         subjects.forEach(sub => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight:bold; color:#333;">${sub.name}</td>
                 <td>${sub.ects}</td>
-                <td><input type="number" id="${sub.id}_saei" placeholder="-" oninput="calculateGPA()"></td>
-                <td><input type="number" id="${sub.id}_final" placeholder="-" oninput="calculateGPA()"></td>
-                <td id="${sub.id}_grade">--</td>
+                <td><input type="number" id="${sub.id}_saei" placeholder="-" oninput="mainUpdate()"></td>
+                <td><input type="number" id="${sub.id}_final" placeholder="-" oninput="mainUpdate()"></td>
+                <td id="${sub.id}_grade_cell">
+                    <span id="${sub.id}_grade_text">--</span>
+                    <select id="${sub.id}_grade_select" style="display:none;" onchange="mainUpdate()">
+                        <option value="50">مقبول</option>
+                        <option value="60">متوسط</option>
+                        <option value="70">جيد</option>
+                        <option value="80">جيد جداً</option>
+                        <option value="90">امتياز</option>
+                    </select>
+                </td>
             `;
             tbody.appendChild(tr);
         });
 
-        // دالة حساب المعدل والتقدير
-        function calculateGPA() {
+        // الدالة المركزية التي تتحكم بكل شيء (المنطق)
+        function mainUpdate() {
+            const isPredictMode = document.getElementById('predict-mode').checked;
+            const finalHeader = document.getElementById('final-header');
+            
             let totalWeightedScore = 0;
-            const totalECTS = 30; // المجموع الكلي للوحدات
+            const totalECTS = 30; //
+
+            // تغيير مظهر العنوان ليتناسب مع الوضع
+            if (isPredictMode) {
+                finalHeader.innerText = "المطلوب بالفاينل";
+                finalHeader.classList.add("predict-active");
+            } else {
+                finalHeader.innerText = "النهائي (50)";
+                finalHeader.classList.remove("predict-active");
+            }
 
             subjects.forEach(sub => {
-                // جلب القيم من الحقول
-                const saeiInput = document.getElementById(`${sub.id}_saei`).value;
-                const finalInput = document.getElementById(`${sub.id}_final`).value;
+                const saeiInput = document.getElementById(`${sub.id}_saei`);
+                const finalInput = document.getElementById(`${sub.id}_final`);
+                const textGrade = document.getElementById(`${sub.id}_grade_text`);
+                const selectGrade = document.getElementById(`${sub.id}_grade_select`);
+                const gradeCell = document.getElementById(`${sub.id}_grade_cell`);
 
-                // تحويل النص إلى رقم، وإذا كان الحقل فارغاً يعتبر 0
-                const saei = saeiInput ? parseFloat(saeiInput) : 0;
-                const final = finalInput ? parseFloat(finalInput) : 0;
-                const total = saei + final;
+                let saei = parseFloat(saeiInput.value) || 0;
+                let final = 0;
+                let total = 0;
 
-                const gradeCell = document.getElementById(`${sub.id}_grade`);
-                let gradeText = "--";
-                
-                // إعادة تعيين لون الخلية
-                gradeCell.className = ""; 
+                gradeCell.className = ""; // تصفير الألوان
 
-                // حساب التقدير وتلوين الخلية بناءً على الجدول الرسمي
-                if (saeiInput || finalInput) {
-                    if (total >= 90) { gradeText = "امتياز"; gradeCell.classList.add("grade-excellent"); }
-                    else if (total >= 80) { gradeText = "جيد جداً"; gradeCell.classList.add("grade-vgood"); }
-                    else if (total >= 70) gradeText = "جيد";
-                    else if (total >= 60) gradeText = "متوسط";
-                    else if (total >= 50) gradeText = "مقبول";
-                    else if (total >= 45) { gradeText = "مقبول بقرار"; gradeCell.classList.add("grade-fx"); }
-                    else { gradeText = "ضعيف"; gradeCell.classList.add("grade-fail"); }
+                if (isPredictMode) {
+                    // --- وضع التنبؤ (حساب المطلوب) ---
+                    textGrade.style.display = 'none';
+                    selectGrade.style.display = 'inline-block';
+                    
+                    // جعل حقل الفاينل للقراءة فقط وتلوينه للدلالة على أنه محسوب آلياً
+                    finalInput.readOnly = true;
+                    finalInput.style.backgroundColor = '#fff3e0'; 
+                    finalInput.style.border = '2px dashed #ffb74d';
+
+                    const targetTotal = parseInt(selectGrade.value);
+                    let requiredFinal = targetTotal - saei;
+
+                    // معالجة القيم السالبة (إذا كان السعي وحده يغطي التقدير)
+                    if(requiredFinal < 0) requiredFinal = 0;
+
+                    finalInput.value = requiredFinal;
+                    final = requiredFinal;
+                    total = saei + final;
+
+                    // تنبيه ذكي: إذا كانت الدرجة المطلوبة أكبر من 50
+                    if (requiredFinal > 50) {
+                        finalInput.style.color = '#d32f2f';
+                        finalInput.style.fontWeight = 'bold';
+                        finalInput.title = "درجة مستحيلة! الامتحان من 50 فقط";
+                    } else {
+                        finalInput.style.color = 'black';
+                        finalInput.style.fontWeight = 'normal';
+                        finalInput.title = "";
+                    }
+
+                    applyColorToCell(gradeCell, targetTotal);
+
+                } else {
+                    // --- الوضع الطبيعي (إدخال يدوي) ---
+                    textGrade.style.display = 'inline-block';
+                    selectGrade.style.display = 'none';
+                    
+                    // إعادة حقل الفاينل للحالة الطبيعية
+                    finalInput.readOnly = false;
+                    finalInput.style.backgroundColor = '#fafafa';
+                    finalInput.style.border = 'none';
+                    finalInput.style.borderTop = '2px solid #a0a0a0';
+                    finalInput.style.borderLeft = '2px solid #a0a0a0';
+                    finalInput.style.color = 'black';
+                    finalInput.style.fontWeight = 'normal';
+
+                    final = parseFloat(finalInput.value) || 0;
+                    total = saei + final;
+
+                    if (saeiInput.value || finalInput.value) {
+                        let gradeText = "";
+                        if (total >= 90) { gradeText = "امتياز"; applyColorToCell(gradeCell, 90); }
+                        else if (total >= 80) { gradeText = "جيد جداً"; applyColorToCell(gradeCell, 80); }
+                        else if (total >= 70) { gradeText = "جيد"; }
+                        else if (total >= 60) { gradeText = "متوسط"; }
+                        else if (total >= 50) { gradeText = "مقبول"; }
+                        else if (total >= 45) { gradeText = "مقبول بقرار"; applyColorToCell(gradeCell, 45); }
+                        else { gradeText = "ضعيف"; applyColorToCell(gradeCell, 0); }
+                        textGrade.innerText = gradeText;
+                    } else {
+                        textGrade.innerText = "--";
+                    }
                 }
 
-                gradeCell.innerText = gradeText;
-                
-                // جمع النقاط لضربها في الوزن (الوحدات)
+                // إضافة درجة المادة للمجموع التراكمي
                 totalWeightedScore += (total * sub.ects);
             });
 
-            // حساب المعدل النهائي وعرضه
+            // تحديث شاشة العرض العلوية
             const finalGpa = totalWeightedScore / totalECTS;
             document.getElementById('final-gpa').innerText = finalGpa.toFixed(2);
         }
+
+        // دالة مساعدة لتلوين الخلايا
+        function applyColorToCell(cell, score) {
+            if (score >= 90) cell.classList.add("grade-excellent");
+            else if (score >= 80) cell.classList.add("grade-vgood");
+            else if (score >= 45 && score < 50) cell.classList.add("grade-fx");
+            else if (score < 45) cell.classList.add("grade-fail");
+        }
+
+        // تشغيل الدالة مرة واحدة عند تحميل الصفحة لتهيئة الشكل
+        window.onload = mainUpdate;
     </script>
 </body>
 </html>
