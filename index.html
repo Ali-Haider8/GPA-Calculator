@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="gpa-screen" id="screen-container">
+            <div class="gpa-label">التقدير الفصلي المتوقع</div>
+            <div class="gpa-value" id="final-gpa-word">--</div>
+        </div>
+
+        <div class="warning-box" id="ects-warning">
+            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30!
+        </div>
+
+        <div class="controls-container">
+            <label class="controls predict">
+                <input type="checkbox" id="predict-mode"> وضع التنبؤ: حساب المطلوب بالفاينل
+            </label>
+            <label class="controls edit-ects">
+                <input type="checkbox" id="edit-ects-mode"> تعديل عدد الوحدات (ECTS)
+            </label>
+            <label class="controls edit-names">
+                <input type="checkbox" id="edit-names-mode"> تعديل أسماء المواد
+            </label>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>المادة</th><th>الوحدات</th><th>السعي (50)</th><th id="final-header">النهائي (50)</th><th>التقدير</th>
+                </tr>
+            </thead>
+            <tbody id="subjects-body"></tbody>
+        </table>
+
+        <div class="collapsible-container">
+            <button class="toggle-tab-btn" id="btn-toggle-save">
+                <span>إظهار نافذة الحفظ والتصدير</span><span id="tab-icon">▼</span>
+            </button>
+
+            <div class="footer-section" id="save-window-content">
+                <div class="info-grid">
+                    <div class="full-width"><label>اسم الطالب: <input type="text" id="student-name" placeholder="اختياري..."></label></div>
+                    <label>الجامعة: <input type="text" id="uni-name" value="جامعة الكوفة"></label>
+                    <label>الكلية: <input type="text" id="college-name" value="كلية علوم الحاسوب والرياضيات"></label>
+                    <label>القسم: <select id="dept-name"></select></label>
+                    <label>السنة الدراسية: <select id="academic-year"></select></label>
+                    <label>المرحلة: <select id="stage-name"></select></label>
+                    <label>الكورس: <select id="semester-name"></select></label>
+                </div>
+                <button class="btn-success" id="btn-export">حفظ النتائج (.txt)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
