@@ -1,0 +1,263 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    populateDropdowns();
+    buildTable();
+    setupEventListeners();
+    mainUpdate();
+});
+
+function populateDropdowns() {
+    const fill = (id, data) => {
+        const el = document.getElementById(id);
+        el.innerHTML = "";
+        data.forEach(item => el.add(new Option(item, item)));
+    };
+    fill('academic-year', APP_CONFIG.academicYears);
+    fill('stage-name', APP_CONFIG.stages);
+    fill('semester-name', APP_CONFIG.semesters);
+}
+
+function buildTable() {
+    const tbody = document.getElementById('subjects-body');
+    APP_CONFIG.defaultSubjects.forEach((sub, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}" readonly></td>
+            <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" oninput="validate(this, 8); mainUpdate();" readonly></td>
+            <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="-" oninput="validate(this, 50); mainUpdate();"></td>
+            <td><input type="number" inputmode="numeric" id="${sub.id}_final" placeholder="-" oninput="validate(this, 50); mainUpdate();"></td>
+            <td id="${sub.id}_grade_cell">
+                <span id="${sub.id}_grade_text">--</span>
+                <select id="${sub.id}_grade_select" style="display:none;" onchange="mainUpdate()">
+                    <option value="50">مقبول</option><option value="60">متوسط</option>
+                    <option value="70">جيد</option><option value="80">جيد جداً</option><option value="90">امتياز</option>
+                </select>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// دالة حماية ذكية وسلسة لا تتعارض مع أسهم المتصفح
+function validate(el, max) {
+    if (el.value === "") return;
+    let val = parseInt(el.value);
+    
+    // منع تجاوز الحد الأقصى فقط (مثلاً 50 أو 8)
+    if (val > max) el.value = max;
+    
+    // منع القيم السالبة
+    if (val < 0) el.value = 0;
+}
+
+function setupEventListeners() {
+    document.getElementById('btn-toggle-save').addEventListener('click', toggleSaveWindow);
+    document.getElementById('btn-gpa-info').addEventListener('click', () => document.getElementById('gpa-modal').classList.add('show'));
+    document.getElementById('btn-close-modal').addEventListener('click', () => document.getElementById('gpa-modal').classList.remove('show'));
+    document.getElementById('btn-export').addEventListener('click', generateTextFile);
+
+    document.getElementById('predict-mode').addEventListener('change', mainUpdate);
+    document.getElementById('edit-ects-mode').addEventListener('change', toggleEctsEdit);
+    document.getElementById('edit-names-mode').addEventListener('change', toggleNamesEdit);
+    
+    document.getElementById('dept-name').addEventListener('input', autoUpdateSubjectNames);
+    document.getElementById('semester-name').addEventListener('change', autoUpdateSubjectNames);
+}
+
+function mainUpdate() {
+    const isPredict = document.getElementById('predict-mode').checked;
+    let totalWeightedScore = 0;
+    let sumEcts = 0;
+    let isEctsValid = true;
+    
+    APP_CONFIG.defaultSubjects.forEach(sub => {
+        const ectsInput = document.getElementById(`${sub.id}_ects`);
+        const saeiInput = document.getElementById(`${sub.id}_saei`);
+        const finalInput = document.getElementById(`${sub.id}_final`);
+        const textGrade = document.getElementById(`${sub.id}_grade_text`);
+        const selectGrade = document.getElementById(`${sub.id}_grade_select`);
+        const gradeCell = document.getElementById(`${sub.id}_grade_cell`);
+        
+        // 1. حساب وتحليل الوحدات مع التنبيه البصري
+        let ectsVal = parseInt(ectsInput.value);
+        if (isNaN(ectsVal)) ectsVal = 0;
+        
+        // إذا قام الطالب بكتابة 1، سيسمح له الكود بالكتابة لكنه سيضيء باللون الأحمر كتحذير
+        if (ectsVal < 2 || ectsVal > 8) {
+            ectsInput.style.border = "2px solid red"; isEctsValid = false;
+        } else {
+            ectsInput.style.border = "none";
+        }
+        sumEcts += ectsVal;
+
+        // 2. معالجة الدرجات
+        const saei = parseFloat(saeiInput.value) || 0;
+        gradeCell.className = ""; 
+        
+        if (isPredict) {
+            textGrade.style.display = 'none';
+            selectGrade.style.display = 'inline-block';
+            finalInput.readOnly = true;
+            
+            const maxPossible = saei + 50; 
+            
+            Array.from(selectGrade.options).forEach(opt => {
+                const requiredScore = parseInt(opt.value);
+                const originalText = opt.text.replace(' (مستحيل)', '');
+                if (requiredScore > maxPossible) {
+                    opt.disabled = true; opt.style.color = '#ccc'; opt.text = originalText + ' (مستحيل)';
+                } else {
+                    opt.disabled = false; opt.style.color = 'black'; opt.text = originalText;
+                }
+            });
+
+            if (parseInt(selectGrade.value) > maxPossible) {
+                let highestValid = 50;
+                Array.from(selectGrade.options).forEach(opt => { if (!opt.disabled) highestValid = parseInt(opt.value); });
+                selectGrade.value = highestValid.toString();
+            }
+
+            const target = parseInt(selectGrade.value);
+            const req = Math.max(0, target - saei);
+            finalInput.value = req;
+            
+            if (req > 50) {
+                finalInput.style.color = '#d32f2f'; finalInput.style.fontWeight = 'bold'; finalInput.title = "درجة مستحيلة!";
+            } else {
+                finalInput.style.color = 'black'; finalInput.style.fontWeight = 'normal'; finalInput.title = "";
+            }
+
+            applyColorToCell(gradeCell, target);
+            totalWeightedScore += (target * ectsVal);
+            
+        } else {
+            textGrade.style.display = 'inline-block';
+            selectGrade.style.display = 'none';
+            finalInput.readOnly = false;
+            finalInput.style.color = 'black'; 
+            finalInput.style.fontWeight = 'normal';
+            
+            Array.from(selectGrade.options).forEach(opt => {
+                opt.disabled = false; opt.style.color = 'black'; opt.text = opt.text.replace(' (مستحيل)', '');
+            });
+
+            const final = parseFloat(finalInput.value) || 0;
+            const total = saei + final;
+            
+            if (saeiInput.value !== "" || finalInput.value !== "") {
+                textGrade.innerText = getWord(total);
+                applyColorToCell(gradeCell, total);
+            } else {
+                textGrade.innerText = "--";
+            }
+            totalWeightedScore += (total * ectsVal);
+        }
+    });
+
+    // 3. التنبيهات واحتساب الـ GPA
+    const warningDiv = document.getElementById('ects-warning');
+    const finalGpaElement = document.getElementById('final-gpa-word');
+    
+    if (sumEcts !== 30 || !isEctsValid) {
+        warningDiv.style.display = 'block';
+        document.getElementById('current-ects-sum').innerText = sumEcts;
+        finalGpaElement.innerText = "خطأ في الوحدات";
+        finalGpaElement.style.color = "#d32f2f";
+    } else {
+        warningDiv.style.display = 'none';
+        const gpa = (totalWeightedScore / 30).toFixed(2);
+        
+        if (totalWeightedScore > 0) {
+            finalGpaElement.innerText = getWord(gpa);
+            if (gpa >= 90) finalGpaElement.style.color = "#1b5e20";
+            else if (gpa >= 80) finalGpaElement.style.color = "#2e7d32";
+            else if (gpa >= 70) finalGpaElement.style.color = "#333";
+            else if (gpa >= 60) finalGpaElement.style.color = "#555";
+            else if (gpa >= 50) finalGpaElement.style.color = "#777";
+            else finalGpaElement.style.color = "#d32f2f";
+        } else {
+            finalGpaElement.innerText = "--";
+            finalGpaElement.style.color = "#2e7d32";
+        }
+    }
+}
+
+function getWord(g) {
+    if (g >= 90) return "امتياز";
+    if (g >= 80) return "جيد جداً";
+    if (g >= 70) return "جيد";
+    if (g >= 60) return "متوسط";
+    if (g >= 50) return "مقبول";
+    if (g >= 45) return "مقبول بقرار";
+    return "ضعيف";
+}
+
+function applyColorToCell(cell, score) {
+    if (score >= 90) cell.classList.add("grade-excellent");
+    else if (score >= 80) cell.classList.add("grade-vgood");
+    else if (score >= 45 && score < 50) cell.classList.add("grade-fx");
+    else if (score < 45) cell.classList.add("grade-fail");
+}
+
+function toggleEctsEdit() {
+    const isEditMode = document.getElementById('edit-ects-mode').checked;
+    document.querySelectorAll('.ects-input').forEach(input => {
+        input.readOnly = !isEditMode;
+        isEditMode ? input.classList.add('editable') : input.classList.remove('editable');
+    });
+    mainUpdate();
+}
+
+function toggleNamesEdit() {
+    const isEditMode = document.getElementById('edit-names-mode').checked;
+    document.querySelectorAll('.name-input').forEach(input => {
+        input.readOnly = !isEditMode;
+        isEditMode ? input.classList.add('editable') : input.classList.remove('editable');
+    });
+}
+
+function autoUpdateSubjectNames() {
+    const dept = document.getElementById('dept-name').value.trim();
+    const semester = document.getElementById('semester-name').value;
+    APP_CONFIG.defaultSubjects.forEach((sub, index) => {
+        const nameInput = document.getElementById(`${sub.id}_name`);
+        if (dept.includes('علوم الحاسوب') && semester === 'الأول') {
+            nameInput.value = sub.name;
+        } else {
+            nameInput.value = `مادة ${index + 1}`;
+        }
+    });
+}
+
+function toggleSaveWindow() {
+    document.getElementById('save-window-content').classList.toggle('show');
+}
+
+function generateTextFile() {
+    const getVal = id => document.getElementById(id).value.trim() || "-";
+    const studentName = getVal('student-name');
+    const isPredict = document.getElementById('predict-mode').checked;
+
+    let content = `اسم الطالب: ${studentName}\r\nالجامعة: ${getVal('uni-name')}\r\nالكلية: ${getVal('college-name')}\r\nالقسم: ${getVal('dept-name')}\r\nالسنة الدراسية: ${getVal('academic-year')} | المرحلة: ${getVal('stage-name')} | الفصل: ${getVal('semester-name')}\r\n`;
+    if (isPredict) content += `(ملاحظة: هذه النتيجة مبنية على وضع التنبؤ والتخطيط)\r\n`;
+    content += `--------------------------------------------------\r\n\r\n`;
+
+    APP_CONFIG.defaultSubjects.forEach(sub => {
+        let ects = document.getElementById(`${sub.id}_ects`).value;
+        let currentName = document.getElementById(`${sub.id}_name`).value; 
+        let saei = document.getElementById(`${sub.id}_saei`).value || "-";
+        let final = document.getElementById(`${sub.id}_final`).value || "-";
+        let grade = document.getElementById(`${sub.id}_grade_text`).innerText;
+        if(isPredict) grade = document.getElementById(`${sub.id}_grade_select`).options[document.getElementById(`${sub.id}_grade_select`).selectedIndex].text;
+        
+        content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي (من 50): ${saei}\r\nالامتحان النهائي: ${final}\r\nالتقدير: ${grade.replace(' (مستحيل)', '')}\r\n\r\n`;
+    });
+
+    content += `--------------------------------------------------\r\nالتقدير العام: ${document.getElementById('final-gpa-word').innerText}\r\n`;
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+    link.download = studentName !== "-" ? `نتيجة_${studentName.replace(/\s+/g, '_')}.txt` : `نتيجة_طالب.txt`; 
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+</script>
