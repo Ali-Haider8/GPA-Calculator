@@ -21,7 +21,7 @@ GPA = Σ (ECTS × Grade) / Total ECTS
 ```
 
 ## 🚀 Live Demo
-https://script.google.com/macros/s/AKfycbyfEIsX76e4A8hWn3w-66SIsS5U961e05p2G8S_B1W_WpUe86E7896Ue/exec
+https://script.google.com/macros/s/AKfycbzEbyWP2eKiZM7_UJG3mRuYpk-nP-tmh2QLVPdFihvzg9MELtJ3zOos_Ig1RYTbn9w0/exec
 
 ## 👤 Author
 Ali Haider  
