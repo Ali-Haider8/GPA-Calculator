@@ -1,7 +1,8 @@
 # 📊 GPA Calculator - Bologna System
 
-<img src="https://i.vgy.me/B50w3u.png" alt="Results Export">
+<img src="https://i.vgy.me/B50w3u.png" width=750 alt="Results Export">
 
+[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Try%20Now-blue?style=for-the-badge)](https://gpt-calculator.linkyhost.com)
 
 **Real-time ECTS-based GPA calculator for Bologna system students.** Enter your course scores (saei: 0-50) → See predicted exam scores needed for each grade → One-click export with metadata.
 
