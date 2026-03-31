@@ -32,7 +32,7 @@
 
         <div class="controls-container">
             <label class="controls predict">
-                <input type="checkbox" id="predict-mode"> وضع التنبؤ: حساب المطلوب بالفاينل بناءً على التقدير المستهدف
+                <input type="checkbox" id="predict-mode"> وضع التنبؤ: اختر التقدير المستهدف ليتم حساب المطلوب بالفاينل
             </label>
             <label class="controls edit-ects">
                 <input type="checkbox" id="edit-ects-mode"> تعديل عدد الوحدات لكل مادة (ECTS)
@@ -49,8 +49,8 @@
                         <th>المادة</th>
                         <th>الوحدات</th>
                         <th>السعي (50)</th>
-                        <th id="final-header">النهائي (50)</th>
-                        <th>التقدير</th>
+                        <th id="final-header">التقدير النهائي</th>
+                        <th>المتوسط المتوقع</th>
                     </tr>
                 </thead>
                 <tbody id="subjects-body"></tbody>
@@ -128,11 +128,16 @@
                     $$GPA = \frac{\sum (ECTS \times Grade)}{Total \ ECTS}$$
                 </div>
 
-                <p><strong>مثال توضيحي (من الوثيقة الرسمية):</strong><br>
-                إذا كان مجموع نواتج ضرب (الدرجة × الوحدات) يساوي <strong>2490</strong>، ومجموع الوحدات للفصل هو <strong>30</strong>، فإن:</p>
+                <p><strong>مثال توضيحي:</strong><br>
+                إذا اخترت تقديرات مختلفة لمواد مختلفة، يتم احتساب متوسط كل تقدير:<br>
+                • امتياز = 95<br>
+                • جيد جداً = 85<br>
+                • جيد = 75<br>
+                • متوسط = 65<br>
+                • مقبول = 55</p>
                 
-                <div style="text-align: center; color: #1976d2; font-weight: bold; font-size: 1.2rem;">
-                    $$GPA = 2490 \div 30 = 83\%$$
+                <div style="text-align: center; color: #1976d2; font-weight: bold; font-size: 1.1rem;">
+                    $$GPA = \frac{\sum (ECTS \times Grade)}{30}$$
                 </div>
             </div>
         </div>
