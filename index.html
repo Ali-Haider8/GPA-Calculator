@@ -21,7 +21,7 @@
 <body>
 
     <div class="app-container">
-        <div class="gpa-screen" id="screen-container">
+        <div class="gpa-screen" id="screen-container" style="display: none;">
             <div class="gpa-label">التقدير الفصلي المتوقع</div>
             <div class="gpa-value" id="final-gpa-word">--</div>
         </div>
@@ -47,7 +47,7 @@
                         <th>الوحدات</th>
                         <th>السعي (50)</th>
                         <th id="final-header">التقدير النهائي</th>
-                        <th>المتوسط المتوقع</th>
+                        <th>GPA المادة</th>
                     </tr>
                 </thead>
                 <tbody id="subjects-body"></tbody>
@@ -76,10 +76,14 @@
                     </label>
                     
                     <label>القسم:
-                        <select id="dept-name"></select>
+                        <input type="text" id="dept-name" value="علوم الحاسوب">
                     </label>
                     <label>السنة الدراسية:
-                        <select id="academic-year"></select>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="number" id="academic-year-start" placeholder="من" min="2000" max="2026" style="width: 80px;" oninput="validateYear(this, 2000, 2026); updateAcademicYear();">
+                            <span>-</span>
+                            <input type="number" id="academic-year-end" placeholder="إلى" min="2000" max="2026" style="width: 80px;" oninput="validateYear(this, 2000, 2026); updateAcademicYear();">
+                        </div>
                     </label>
 
                     <label>المرحلة:
