@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    
+    <!-- Google Fonts - Inter for modern Samsung-style typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+
+    <style>
+        /* ========================================
+           SAMSUNG ONE UI DESIGN SYSTEM
+           ======================================== */
+        
+        :root {
+            /* Color Palette - Samsung One UI Style */
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --bg-surface: #FFFFFF;
+            --bg-gpa-display: #E6F4EA;
+            
+            --primary-green: #00C853;
+            --primary-green-dark: #009624;
+            --primary-green-light: #B9F6CA;
+            
+            --text-primary: #000000;
+            --text-secondary: #5F6368;
+            --text-disabled: #9AA0A6;
+            --text-on-green: #FFFFFF;
+            
+            --border-light: #E8EAED;
+            --border-focus: #4285F4;
+            --border-focus-ring: rgba(66, 133, 244, 0.2);
+            
+            --error: #D93025;
+            --error-bg: #FAD2CF;
+            --warning: #B98900;
+            --warning-bg: #FEF7E0;
+            
+            /* Grade Colors - Soft Modern */
+            --grade-excellent-bg: #E6F4EA;
+            --grade-excellent-text: #137333;
+            --grade-vgood-bg: #E8F0FE;
+            --grade-vgood-text: #1967D2;
+            --grade-good-bg: #F1F3F4;
+            --grade-good-text: #3C4043;
+            --grade-avg-bg: #FEF7E0;
+            --grade-avg-text: #B98900;
+            --grade-acceptable-bg: #FCE8E6;
+            --grade-acceptable-text: #A50E0E;
+            --grade-fail-bg: #FAD2CF;
+            --grade-fail-text: #D93025;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Border Radius - Samsung's generous rounding */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+            
+            /* Shadows - Subtle elevation */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 4px 24px rgba(0, 0, 0, 0.12);
+            --shadow-focus: 0 0 0 4px var(--border-focus-ring);
+            
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #F0F2F5 0%, #E8EAED 100%);
+            margin: 0;
+            padding: var(--spacing-md);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Main Container - Card Style */
+        .app-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            padding: var(--spacing-xl);
+            width: 100%;
+            max-width: 900px;
+            margin-top: var(--spacing-lg);
+        }
+
+        /* ========================================
+           GPA DISPLAY - Samsung Calculator Style
+           ======================================== */
+        .gpa-display-card {
+            background: var(--bg-gpa-display);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl) var(--spacing-lg);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            transition: all var(--transition-normal);
+        }
+
+        .gpa-display-title {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: 0.3px;
+        }
+
+        .gpa-value-container {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: var(--spacing-xs);
+        }
+
+        .gpa-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--grade-excellent-text);
+            line-height: 1;
+            font-feature-settings: 'tnum' on, 'lnum' on;
+            transition: color var(--transition-normal);
+        }
+
+        .gpa-scale {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* ========================================
+           WARNING BOX
+           ======================================== */
+        .warning-box {
+            background: var(--error-bg);
+            color: var(--error);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            margin-bottom: var(--spacing-lg);
+            display: none;
+            animation: slideIn var(--transition-slow);
+            border: 1px solid rgba(217, 48, 37, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========================================
+           TABLE - Card-based Rows
+           ======================================== */
+        .table-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .table-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            padding: 0 var(--spacing-xs);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-lg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 750px;
+        }
+
+        thead {
+            background: var(--bg-secondary);
+        }
+
+        th {
+            padding: var(--spacing-md);
+            text-align: center;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        th:first-child {
+            border-radius: 0 var(--radius-sm) 0 0;
+            text-align: right;
+        }
+
+        th:last-child {
+            border-radius: var(--radius-sm) 0 0 0;
+        }
+
+        tbody tr {
+            background: var(--bg-surface);
+            transition: all var(--transition-fast);
+        }
+
+        tbody tr:not(:last-child) td {
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        td {
+            padding: var(--spacing-md);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td:first-child {
+            text-align: right;
+        }
+
+        /* ========================================
+           INPUT FIELDS - Samsung Style
+           ======================================== */
+        input[type="number"],
+        input[type="text"],
+        select {
+            font-family: var(--font-family);
+            font-size: 0.9375rem;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            outline: none;
+            transition: all var(--transition-fast);
+            width: 100%;
+        }
+
+        input[type="number"]:hover:not(:disabled),
+        input[type="text"]:hover:not(:disabled),
+        select:hover:not(:disabled) {
+            border-color: var(--text-secondary);
+            background: #FFFFFF;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--border-focus);
+            background: #FFFFFF;
+            box-shadow: var(--shadow-focus);
+        }
+
+        input[type="number"]:disabled,
+        input[type="text"]:disabled,
+        select:disabled {
+            background: var(--bg-secondary);
+            color: var(--text-disabled);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Specific Input Styles */
+        .name-input {
+            min-width: 140px;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .ects-input {
+            width: 60px;
+        }
+
+        .saei-input {
+            width: 70px;
+        }
+
+        .grade-select {
+            min-width: 140px;
+            cursor: pointer;
+        }
+
+        .exam-select {
+            min-width: 70px;
+            font-weight: 600;
+            color: var(--primary-green-dark);
+        }
+
+        .gpa-result {
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 60px;
+            display: inline-block;
+        }
+
+        /* ========================================
+           GRADE COLORS
+           ======================================== */
+        .grade-excellent { background-color: var(--grade-excellent-bg); color: var(--grade-excellent-text); }
+        .grade-vgood { background-color: var(--grade-vgood-bg); color: var(--grade-vgood-text); }
+        .grade-good { background-color: var(--grade-good-bg); color: var(--grade-good-text); }
+        .grade-avg { background-color: var(--grade-avg-bg); color: var(--grade-avg-text); }
+        .grade-acceptable { background-color: var(--grade-acceptable-bg); color: var(--grade-acceptable-text); }
+        .grade-fail { background-color: var(--grade-fail-bg); color: var(--grade-fail-text); }
+
+        /* ========================================
+           COLLAPSIBLE SECTION
+           ======================================== */
+        .collapsible-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: var(--spacing-lg);
+        }
+
+        .toggle-tab-btn {
+            width: 100%;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            padding: var(--spacing-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-family);
+            text-align: right;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background var(--transition-fast);
+        }
+
+        .toggle-tab-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .toggle-tab-btn:active {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .toggle-icon {
+            font-size: 1.25rem;
+            transition: transform var(--transition-normal);
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .footer-section {
+            padding: var(--spacing-lg);
+            display: none;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            border-top: 1px solid var(--border-light);
+            background: var(--bg-surface);
+        }
+
+        .footer-section.show {
+            display: flex;
+            animation: slideDown var(--transition-slow);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========================================
+           INFO GRID - Form Layout
+           ======================================== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .info-grid .full-width {
+            grid-column: span 2;
+        }
+
+        .info-grid label {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .info-grid label span {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* ========================================
+           BUTTONS - Samsung Style
+           ======================================== */
+        .btn-primary {
+            width: 100%;
+            background: var(--primary-green);
+            color: var(--text-on-green);
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-family);
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-green-dark);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Ripple Effect */
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* ========================================
+           FLOATING INFO BUTTON
+           ======================================== */
+        .info-btn-fab {
+            position: fixed;
+            left: var(--spacing-lg);
+            bottom: var(--spacing-lg);
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #FF6D00 0%, #FF3D00 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(255, 109, 0, 0.4);
+            transition: all var(--transition-fast);
+            z-index: 100;
+            padding: 0;
+        }
+
+        .info-btn-fab:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(255, 109, 0, 0.5);
+        }
+
+        .info-btn-fab:active {
+            transform: scale(0.95);
+        }
+
+        .info-btn-fab .info-icon {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .info-btn-fab .info-text {
+            font-size: 0.625rem;
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========================================
+           MODAL - Samsung Dialog Style
+           ======================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity var(--transition-slow);
+            padding: var(--spacing-md);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-2xl);
+            width: 100%;
+            max-width: 560px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px) scale(0.95);
+            transition: transform var(--transition-slow);
+            color: var(--text-primary);
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--error-bg);
+            color: var(--error);
+        }
+
+        .modal-content h2 {
+            color: var(--text-primary);
+            margin: 0 0 var(--spacing-md) 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-content p {
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .modal-content hr {
+            border: none;
+            border-top: 1px solid var(--border-light);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .modal-sub-section h3 {
+            color: var(--primary-green-dark);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
+        }
+
+        .modal-content ul {
+            padding-right: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+        }
+
+        .modal-content li {
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .math-box {
+            background: var(--bg-secondary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin: var(--spacing-md) 0;
+            text-align: center;
+            font-size: 0.9375rem;
+            border: 1px solid var(--border-light);
+        }
+
+        /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-sm);
+            }
+
+            .app-container {
+                padding: var(--spacing-lg);
+                margin-top: var(--spacing-md);
+            }
+
+            .gpa-value {
+                font-size: 3rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid .full-width {
+                grid-column: span 1;
+            }
+
+            table {
+                min-width: 700px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: var(--spacing-md);
+                border-radius: var(--radius-xl);
+            }
+
+            .gpa-display-card {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .gpa-value {
+                font-size: 2.5rem;
+            }
+
+            .gpa-scale {
+                font-size: 1rem;
+            }
+
+            .info-btn-fab {
+                width: 56px;
+                height: 56px;
+                left: var(--spacing-md);
+                bottom: var(--spacing-md);
+            }
+
+            .info-btn-fab .info-icon {
+                font-size: 1.5rem;
+            }
+
+            .info-btn-fab .info-text {
+                font-size: 0.5625rem;
+            }
+
+            .modal-content {
+                padding: var(--spacing-lg);
+            }
+
+            .modal-content h2 {
+                font-size: 1.25rem;
+            }
+
+            table {
+                min-width: 650px;
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: var(--spacing-sm);
+            }
+
+            input[type="number"],
+            input[type="text"],
+            select {
+                font-size: 0.875rem;
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+        }
+
+        /* ========================================
+           ACCESSIBILITY
+           ======================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus visible for keyboard navigation */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--border-focus);
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-light: #000000;
+                --text-secondary: #000000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- GPA Display - Samsung Calculator Style -->
+        <div class="gpa-display-card">
+            <div class="gpa-display-title">المعدل الفصلي (GPA) المتوقع</div>
+            <div class="gpa-value-container">
+                <span class="gpa-value" id="final-gpa-word">--</span>
+                <span class="gpa-scale">/ 4.0</span>
+            </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box" id="ects-warning">
+            ⚠️ المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30 وحدة بالضبط!
+        </div>
+
+        <!-- Subjects Table Section -->
+        <div class="table-section">
+            <h2 class="table-header">المواد الدراسية</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المادة</th>
+                            <th>الوحدات</th>
+                            <th>السعي (50)</th>
+                            <th>التقدير المحرز</th>
+                            <th>الفاينل المتوقع</th>
+                            <th>GPA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjects-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Collapsible Save/Export Section -->
+        <div class="collapsible-container">
+            <button class="toggle-tab-btn" id="btn-toggle-save">
+                <span>إظهار نافذة الحفظ والتصدير</span>
+                <span class="toggle-icon" id="tab-icon">▼</span>
+            </button>
+
+            <div class="footer-section" id="save-window-content">
+                <div class="info-grid">
+                    <div class="full-width">
+                        <label>
+                            <span>اسم الطالب</span>
+                            <input type="text" id="student-name" placeholder="اختياري...">
+                        </label>
+                    </div>
+
+                    <label>
+                        <span>الجامعة</span>
+                        <input type="text" id="uni-name" value="جامعة الكوفة">
+                    </label>
+                    <label>
+                        <span>الكلية</span>
+                        <input type="text" id="college-name" value="كلية علوم الحاسوب والرياضيات">
+                    </label>
+
+                    <label>
+                        <span>القسم</span>
+                        <input type="text" id="dept-name" value="علوم الحاسوب">
+                    </label>
+                    <label>
+                        <span>السنة الدراسية</span>
+                        <select id="academic-year-select"></select>
+                    </label>
+
+                    <label>
+                        <span>المرحلة</span>
+                        <select id="stage-name"></select>
+                    </label>
+                    <label>
+                        <span>الكورس (الفصل)</span>
+                        <select id="semester-name"></select>
+                    </label>
+                </div>
+
+                <button class="btn-primary" id="btn-export">
+                    📥 حفظ النتائج وتصدير ملف (.txt)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Info Button (FAB) -->
+    <button class="info-btn-fab" id="btn-gpa-info" aria-label="معلومات عن GPA">
+        <span class="info-icon">?</span>
+        <span class="info-text">GPA</span>
+    </button>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="gpa-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="btn-close-modal">&times;</button>
+            <h2>ما هو معدل الـ GPA؟</h2>
+            
+            <p>معدل الـ <strong>GPA</strong> (Grade Point Average) هو المقياس العالمي لتقييم أداء الطالب الأكاديمي في <strong>مسار بولونيا</strong>.</p>
+
+            <div class="modal-sub-section">
+                <h3>📌 أهمية المعدل</h3>
+                <ul>
+                    <li><strong>احتساب الأوائل:</strong> هو المعيار الرئيسي لتحديد ترتيب التفوق في القسم</li>
+                    <li><strong>الدراسات العليا:</strong> شرط أساسي للقبول في برامج الماجستير والدكتوراه</li>
+                    <li><strong>سوق العمل:</strong> يعكس التزامك الأكاديمي وتميزك</li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <div class="modal-sub-section">
+                <h3>📐 كيف يُحتسب المعدل؟</h3>
+                <p>يُحسب معدل الفصل بجمع ناتج ضرب درجة كل مادة في وحداتها (ECTS)، ثم قسمة المجموع على عدد الوحدات الكلي للفصل.</p>
+
+                <div class="math-box">
+                    <strong>المعادلة الرسمية:</strong><br><br>
+                    $$GPA = \frac{\sum (ECTS \times Grade)}{Total \ ECTS}$$
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIG ===
+        const APP_CONFIG = {
+            academicYears: ["2025-2026", "2024-2025", "2023-2024", "2022-2023"],
+            stages: ["الأولى", "الثانية", "الثالثة", "الرابعة"],
+            semesters: ["الأول", "الثاني"],
+            defaultSubjects: [
+                { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
+                { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
+                { id: 'math', name: 'الرياضيات', ects: 6 },
+                { id: 'arabic', name: 'لغة عربية', ects: 3 },
+                { id: 'english', name: 'أساسيات اللغة الإنجليزية', ects: 4 },
+                { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
+            ]
+        };
+
+        // === GRADES MAP ===
+        const GRADES_MAP = {
+            excellence: { label: 'امتياز (90-100)', minTarget: 90, maxTarget: 100 },
+            vGood: { label: 'جيد جداً (80-89)', minTarget: 80, maxTarget: 89 },
+            good: { label: 'جيد (70-79)', minTarget: 70, maxTarget: 79 },
+            avg: { label: 'متوسط (60-69)', minTarget: 60, maxTarget: 69 },
+            acceptable: { label: 'مقبول (50-59)', minTarget: 50, maxTarget: 59 },
+            fail_fx: { label: 'راسب قيد المعالجة (45-49)', minTarget: 45, maxTarget: 49 },
+            fail_f: { label: 'راسب (0-44)', minTarget: 0, maxTarget: 44 }
+        };
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDropdowns();
+            buildTable();
+            setupEventListeners();
+            mainUpdate();
+        });
+
+        function populateDropdowns() {
+            const fill = (id, data) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = "";
+                data.forEach(item => el.add(new Option(item, item)));
+            };
+            fill('academic-year-select', APP_CONFIG.academicYears);
+            fill('stage-name', APP_CONFIG.stages);
+            fill('semester-name', APP_CONFIG.semesters);
+        }
+
+        function buildTable() {
+            const tbody = document.getElementById('subjects-body');
+            tbody.innerHTML = "";
+
+            APP_CONFIG.defaultSubjects.forEach((sub) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}" oninput="mainUpdate()"></td>
+                    <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8" oninput="mainUpdate()"></td>
+                    <td><input type="number" inputmode="numeric" id="${sub.id}_saei" class="saei-input" placeholder="50" min="0" max="50" oninput="handleSaeiChange(this, '${sub.id}')"></td>
+                    <td>
+                        <select id="${sub.id}_final_grade" class="grade-select" onchange="handleGradeChange('${sub.id}')" disabled>
+                            <option value="">-- أدخل السعي --</option>
+                            <option value="excellence">امتياز (90-100)</option>
+                            <option value="vGood">جيد جداً (80-89)</option>
+                            <option value="good">جيد (70-79)</option>
+                            <option value="avg">متوسط (60-69)</option>
+                            <option value="acceptable">مقبول (50-59)</option>
+                            <option value="fail_fx">راسب قيد المعالجة (45-49)</option>
+                            <option value="fail_f">راسب (0-44)</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="${sub.id}_predicted_exam" class="exam-select" onchange="mainUpdate()" disabled>
+                            <option value="">-</option>
+                        </select>
+                    </td>
+                    <td>
+                        <span id="${sub.id}_gpa_text" class="gpa-result">--</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function validate(el, max) {
+            if (el.value === "") return;
+            let val = parseInt(el.value);
+            if (val > max) el.value = max;
+            if (val < 0) el.value = 0;
+        }
+
+        function handleSaeiChange(el, subjectId) {
+            validate(el, 50);
+            enableGradeSelect(subjectId);
+            updateExamDropdown(subjectId);
+            mainUpdate();
+        }
+
+        function handleGradeChange(subjectId) {
+            updateExamDropdown(subjectId);
+            mainUpdate();
+        }
+
+        function enableGradeSelect(subjectId) {
+            const saeiInput = document.getElementById(`${subjectId}_saei`);
+            const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+
+            if (saeiInput.value && parseFloat(saeiInput.value) >= 0) {
+                const saei = parseFloat(saeiInput.value);
+
+                if (saei < 14) {
+                    gradeSelect.disabled = true;
+                    gradeSelect.value = "";
+                    gradeSelect.options[0].text = "-- راسب (السعي < 14) --";
+                } else {
+                    gradeSelect.disabled = false;
+                    updateGradeOptions(gradeSelect, saei);
+                }
+            } else {
+                gradeSelect.disabled = true;
+                gradeSelect.value = "";
+                gradeSelect.options[0].text = "-- أدخل السعي --";
+            }
+        }
+
+        function updateGradeOptions(gradeSelect, saei) {
+            const options = gradeSelect.options;
+            let hasValidOption = false;
+
+            for (let i = 1; i < options.length; i++) {
+                const opt = options[i];
+                const gradeData = GRADES_MAP[opt.value];
+
+                if (!gradeData) continue;
+
+                const maxPossible = saei + 50;
+                const minPossibleFinal = gradeData.minTarget >= 50 ? 25 : 0;
+
+                const canReachMin = maxPossible >= gradeData.minTarget;
+                const canStayUnderMax = (saei + minPossibleFinal) <= gradeData.maxTarget;
+
+                if (canReachMin && canStayUnderMax) {
+                    opt.style.display = '';
+                    opt.disabled = false;
+                    hasValidOption = true;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            }
+
+            if (!hasValidOption) {
+                options[0].text = "-- السعي لا يكفي --";
+            } else {
+                options[0].text = "-- اختر التقدير --";
+            }
+
+            if (gradeSelect.value && GRADES_MAP[gradeSelect.value]) {
+                const selectedOpt = Array.from(options).find(opt => opt.value === gradeSelect.value);
+                if (selectedOpt && selectedOpt.style.display === 'none') {
+                    gradeSelect.value = "";
+                }
+            }
+        }
+
+        function updateExamDropdown(subjectId) {
+            const saeiInput = document.getElementById(`${subjectId}_saei`);
+            const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+            const examSelect = document.getElementById(`${subjectId}_predicted_exam`);
+
+            const saei = parseFloat(saeiInput.value);
+
+            if (isNaN(saei) || saei < 14 || !gradeSelect.value) {
+                examSelect.innerHTML = '<option value="">-</option>';
+                examSelect.disabled = true;
+                return;
+            }
+
+            const gradeData = GRADES_MAP[gradeSelect.value];
+
+            let minExam = gradeData.minTarget - saei;
+            let maxExam = gradeData.maxTarget - saei;
+
+            if (gradeData.minTarget >= 50 && minExam < 25) minExam = 25;
+            if (minExam < 0) minExam = 0;
+            if (maxExam > 50) maxExam = 50;
+
+            examSelect.innerHTML = '';
+
+            if (minExam > maxExam) {
+                examSelect.innerHTML = '<option value="">-</option>';
+                examSelect.disabled = true;
+                return;
+            }
+
+            let previousValue = parseInt(examSelect.value);
+
+            for (let i = minExam; i <= maxExam; i++) {
+                examSelect.add(new Option(i.toString(), i));
+            }
+
+            examSelect.disabled = false;
+
+            if (!isNaN(previousValue) && previousValue >= minExam && previousValue <= maxExam) {
+                examSelect.value = previousValue;
+            } else {
+                examSelect.value = minExam;
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('btn-toggle-save').addEventListener('click', toggleSaveWindow);
+            document.getElementById('btn-gpa-info').addEventListener('click', () =>
+                document.getElementById('gpa-modal').classList.add('show'));
+            document.getElementById('btn-close-modal').addEventListener('click', () =>
+                document.getElementById('gpa-modal').classList.remove('show'));
+            document.getElementById('btn-export').addEventListener('click', (e) => {
+                addRippleEffect(e);
+                generateTextFile();
+            });
+
+            document.getElementById('gpa-modal').addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    document.getElementById('gpa-modal').classList.remove('show');
+                }
+            });
+        }
+
+        function toggleSaveWindow() {
+            const content = document.getElementById('save-window-content');
+            content.classList.toggle('show');
+            const icon = document.getElementById('tab-icon');
+            icon.classList.toggle('rotated');
+        }
+
+        function addRippleEffect(event) {
+            const button = event.currentTarget;
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+
+            button.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function mainUpdate() {
+            let totalWeightedScore = 0;
+            let sumEcts = 0;
+            let isEctsValid = true;
+            let allSubjectsCompleted = true;
+
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                const ectsInput = document.getElementById(`${sub.id}_ects`);
+                const saeiInput = document.getElementById(`${sub.id}_saei`);
+                const gradeSelect = document.getElementById(`${sub.id}_final_grade`);
+                const examSelect = document.getElementById(`${sub.id}_predicted_exam`);
+                const textGrade = document.getElementById(`${sub.id}_gpa_text`);
+
+                let ectsVal = parseInt(ectsInput.value) || 0;
+                if (ectsVal < 2 || ectsVal > 8) {
+                    ectsInput.style.borderColor = "var(--error)";
+                    isEctsValid = false;
+                } else {
+                    ectsInput.style.borderColor = "var(--border-light)";
+                }
+                sumEcts += ectsVal;
+
+                const saei = parseFloat(saeiInput.value);
+                const predictedExam = parseFloat(examSelect.value);
+
+                if (isNaN(saei) || saei < 0) {
+                    textGrade.innerText = "--";
+                    textGrade.className = "gpa-result";
+                    allSubjectsCompleted = false;
+                    return;
+                }
+
+                if (saei < 14) {
+                    textGrade.innerText = "راسب";
+                    textGrade.className = "gpa-result grade-fail";
+                    totalWeightedScore += (saei * ectsVal);
+                    return;
+                }
+
+                if (gradeSelect.value === "" || isNaN(predictedExam)) {
+                    textGrade.innerText = "--";
+                    textGrade.className = "gpa-result";
+                    allSubjectsCompleted = false;
+                    return;
+                }
+
+                const totalScore = saei + predictedExam;
+
+                textGrade.innerText = totalScore.toFixed(0);
+                applyColorToCell(textGrade, totalScore);
+                totalWeightedScore += (totalScore * ectsVal);
+            });
+
+            const warningDiv = document.getElementById('ects-warning');
+            const finalGpaElement = document.getElementById('final-gpa-word');
+
+            if (allSubjectsCompleted && sumEcts === 30 && isEctsValid) {
+                const gpa = parseFloat((totalWeightedScore / sumEcts).toFixed(2));
+                finalGpaElement.innerText = gpa.toFixed(2);
+
+                if (gpa >= 90) finalGpaElement.style.color = "var(--grade-excellent-text)";
+                else if (gpa >= 80) finalGpaElement.style.color = "var(--grade-vgood-text)";
+                else if (gpa >= 70) finalGpaElement.style.color = "var(--grade-good-text)";
+                else if (gpa >= 60) finalGpaElement.style.color = "var(--grade-avg-text)";
+                else if (gpa >= 50) finalGpaElement.style.color = "var(--grade-acceptable-text)";
+                else finalGpaElement.style.color = "var(--error)";
+            } else {
+                finalGpaElement.innerText = "--";
+                finalGpaElement.style.color = "var(--grade-excellent-text)";
+            }
+
+            if (sumEcts !== 30 || !isEctsValid) {
+                warningDiv.style.display = 'block';
+                document.getElementById('current-ects-sum').innerText = sumEcts;
+            } else {
+                warningDiv.style.display = 'none';
+            }
+        }
+
+        function applyColorToCell(element, score) {
+            element.className = "gpa-result";
+            if (score >= 90) element.classList.add("grade-excellent");
+            else if (score >= 80) element.classList.add("grade-vgood");
+            else if (score >= 70) element.classList.add("grade-good");
+            else if (score >= 60) element.classList.add("grade-avg");
+            else if (score >= 50) element.classList.add("grade-acceptable");
+            else element.classList.add("grade-fail");
+        }
+
+        function generateTextFile() {
+            const getVal = id => document.getElementById(id).value.trim() || "-";
+            const studentName = getVal('student-name');
+
+            const academicYearDisplay = document.getElementById('academic-year-select').value;
+
+            let content = `اسم الطالب: ${studentName}\r\nالجامعة: ${getVal('uni-name')}\r\nالكلية: ${getVal('college-name')}\r\nالقسم: ${getVal('dept-name')}\r\nالسنة الدراسية: ${academicYearDisplay} | المرحلة: ${getVal('stage-name')} | الفصل: ${getVal('semester-name')}\r\n`;
+            content += `--------------------------------------------------\r\n\r\n`;
+
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                const ects = document.getElementById(`${sub.id}_ects`).value;
+                const currentName = document.getElementById(`${sub.id}_name`).value;
+                const saei = document.getElementById(`${sub.id}_saei`).value || "-";
+                const gradeKey = document.getElementById(`${sub.id}_final_grade`).value;
+                const examSelectValue = document.getElementById(`${sub.id}_predicted_exam`).value;
+
+                let gradeLabel = "--";
+                let totalScoreDisplay = "-";
+                let predictedExamDisplay = "-";
+
+                if (saei !== "-") {
+                    const saeiNum = parseFloat(saei);
+                    if (saeiNum < 14) {
+                        gradeLabel = "راسب (السعي أقل من 14)";
+                        totalScoreDisplay = saei;
+                    } else if (gradeKey && examSelectValue !== "") {
+                        gradeLabel = GRADES_MAP[gradeKey].label;
+                        const predictedExamNum = parseFloat(examSelectValue);
+                        const totalScore = saeiNum + predictedExamNum;
+
+                        totalScoreDisplay = totalScore.toFixed(0);
+                        predictedExamDisplay = predictedExamNum.toFixed(0);
+                    }
+                }
+
+                content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي: ${saei}\r\nالتقدير المحرز: ${gradeLabel}\r\nدرجة الفاينل المتوقعة: ${predictedExamDisplay}\r\nالدرجة النهائية: ${totalScoreDisplay}\r\n\r\n`;
+            });
+
+            const finalGpaText = document.getElementById('final-gpa-word').innerText;
+            content += `--------------------------------------------------\r\nالمعدل الفصلي العام (GPA) المتوقع: ${finalGpaText}\r\n`;
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+            link.download = studentName !== "-" ? `نتيجة_${studentName.replace(/\s+/g, '_')}.txt` : `نتيجة_طالب.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

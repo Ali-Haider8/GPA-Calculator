@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+
+    <style>
+        /* ========================================
+           APPLE CALCULATOR DESIGN SYSTEM
+           ======================================== */
+        
+        :root {
+            /* Apple Calculator Color Palette */
+            --bg-black: #000000;
+            --bg-dark-gray: #1C1C1C;
+            
+            /* Button Colors */
+            --btn-number: #333333;
+            --btn-number-active: #737373;
+            --btn-function: #A5A5A5;
+            --btn-function-active: #D9D9D9;
+            --btn-action: #FF9F0A;
+            --btn-action-active: #FFB84D;
+            
+            /* Text Colors */
+            --text-white: #FFFFFF;
+            --text-black: #000000;
+            --text-secondary: #8E8E93;
+            
+            /* Accent Colors for Grades */
+            --grade-excellent: #30D158;
+            --grade-vgood: #0A84FF;
+            --grade-good: #5E5CE6;
+            --grade-avg: #FFD60A;
+            --grade-acceptable: #FF9F0A;
+            --grade-fail: #FF453A;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+            
+            /* Border Radius */
+            --radius-btn: 50%;
+            --radius-card: 20px;
+            --radius-modal: 28px;
+            
+            /* Shadows */
+            --shadow-btn: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+            background: var(--bg-black);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           MAIN CONTAINER
+           ======================================== */
+        .app-container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+            padding-bottom: 100px;
+        }
+
+        /* ========================================
+           GPA DISPLAY - Apple Calculator Style
+           ======================================== */
+        .gpa-display {
+            text-align: left;
+            padding: var(--spacing-xl) var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .gpa-label {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .gpa-value-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: flex-end;
+            gap: var(--spacing-xs);
+        }
+
+        .gpa-value {
+            font-size: 5rem;
+            font-weight: 300;
+            color: var(--text-white);
+            line-height: 1;
+            font-feature-settings: 'tnum' on, 'lnum' on;
+            letter-spacing: -2px;
+            transition: color 0.3s ease;
+        }
+
+        .gpa-scale {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+        }
+
+        /* ========================================
+           WARNING BOX
+           ======================================== */
+        .warning-box {
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--grade-fail);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-card);
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--spacing-md);
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 69, 58, 0.3);
+        }
+
+        /* ========================================
+           SUBJECT CARDS - Button Style
+           ======================================== */
+        .subjects-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: var(--spacing-lg);
+            padding: 0 var(--spacing-sm);
+        }
+
+        .subject-card {
+            background: var(--bg-dark-gray);
+            border-radius: var(--radius-card);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .subject-card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-card);
+        }
+
+        .subject-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .input-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* ========================================
+           INPUTS - Apple Style
+           ======================================== */
+        input[type="number"],
+        input[type="text"],
+        select {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            padding: var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-btn);
+            background: var(--btn-number);
+            color: var(--text-white);
+            outline: none;
+            text-align: center;
+            width: 100%;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            background: var(--btn-number-active);
+            box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.3);
+        }
+
+        input[type="number"]:disabled,
+        input[type="text"]:disabled,
+        select:disabled {
+            background: #2C2C2C;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 10px center;
+            background-size: 16px;
+            padding-left: 40px;
+        }
+
+        select option {
+            background: var(--bg-dark-gray);
+            color: var(--text-white);
+            font-size: 1rem;
+            padding: 10px;
+        }
+
+        .name-input {
+            grid-column: span 3;
+            font-size: 1rem;
+            text-align: right;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: var(--spacing-md);
+        }
+
+        .ects-input {
+            font-size: 1.125rem;
+        }
+
+        .saei-input {
+            font-size: 1.125rem;
+        }
+
+        .grade-select {
+            grid-column: span 3;
+            font-size: 0.9375rem;
+            background: var(--btn-action);
+            color: var(--text-white);
+            font-weight: 500;
+        }
+
+        .grade-select option {
+            background: var(--bg-dark-gray);
+        }
+
+        .exam-select {
+            grid-column: span 3;
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: #2C2C2C;
+        }
+
+        /* ========================================
+           GPA RESULT BUTTON
+           ======================================== */
+        .gpa-result-btn {
+            grid-column: span 3;
+            width: 100%;
+            height: 60px;
+            border-radius: 30px;
+            border: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-white);
+            background: var(--btn-action);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: var(--spacing-sm);
+        }
+
+        .gpa-result-btn:hover {
+            background: var(--btn-action-active);
+            transform: scale(1.02);
+        }
+
+        .gpa-result-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Grade Colors */
+        .grade-excellent { background: var(--grade-excellent) !important; }
+        .grade-vgood { background: var(--grade-vgood) !important; }
+        .grade-good { background: var(--grade-good) !important; }
+        .grade-avg { background: var(--grade-avg) !important; }
+        .grade-acceptable { background: var(--grade-acceptable) !important; }
+        .grade-fail { background: var(--grade-fail) !important; }
+
+        /* ========================================
+           ACTION BUTTONS - Apple Calculator Style
+           ======================================== */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-md);
+        }
+
+        .calc-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: var(--radius-btn);
+            border: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: var(--text-white);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .calc-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-number {
+            background: var(--btn-number);
+        }
+
+        .btn-number:active {
+            background: var(--btn-number-active);
+        }
+
+        .btn-function {
+            background: var(--btn-function);
+            color: var(--text-black);
+            font-weight: 500;
+        }
+
+        .btn-function:active {
+            background: var(--btn-function-active);
+        }
+
+        .btn-action {
+            background: var(--btn-action);
+            font-weight: 500;
+        }
+
+        .btn-action:active {
+            background: var(--btn-action-active);
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+            aspect-ratio: auto;
+            border-radius: 40px;
+            justify-content: flex-start;
+            padding-right: 28px;
+        }
+
+        /* ========================================
+           EXPORT BUTTON
+           ======================================== */
+        .export-btn {
+            width: 100%;
+            height: 56px;
+            border-radius: 28px;
+            border: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-white);
+            background: var(--btn-action);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            box-shadow: var(--shadow-btn);
+        }
+
+        .export-btn:hover {
+            background: var(--btn-action-active);
+            transform: scale(1.02);
+        }
+
+        .export-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ========================================
+           INFO BUTTON (FAB)
+           ======================================== */
+        .info-btn-fab {
+            position: fixed;
+            left: var(--spacing-lg);
+            bottom: var(--spacing-lg);
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-btn);
+            background: var(--btn-function);
+            color: var(--text-black);
+            border: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-btn);
+            transition: all 0.2s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-btn-fab:hover {
+            background: var(--btn-function-active);
+            transform: scale(1.08);
+        }
+
+        .info-btn-fab:active {
+            transform: scale(0.95);
+        }
+
+        /* ========================================
+           MODAL - Apple iOS Style
+           ======================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #1C1C1E;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-modal) var(--radius-modal) 0 0;
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            color: var(--text-white);
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: var(--text-secondary);
+            border-radius: 3px;
+            margin: 0 auto var(--spacing-lg) auto;
+            opacity: 0.5;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-lg);
+            left: var(--spacing-lg);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            font-size: 1.5rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-content h2 {
+            color: var(--text-white);
+            margin: 0 0 var(--spacing-md) 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .modal-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .modal-content hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .modal-sub-section h3 {
+            color: var(--text-white);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
+        }
+
+        .modal-content ul {
+            padding-right: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+        }
+
+        .modal-content li {
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .math-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: var(--spacing-lg);
+            border-radius: 16px;
+            margin: var(--spacing-md) 0;
+            text-align: center;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ========================================
+           SAVE PANEL - iOS Sheet Style
+           ======================================== */
+        .save-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1C1C1E;
+            border-radius: var(--radius-modal) var(--radius-modal) 0 0;
+            padding: var(--spacing-xl);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 999;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .save-panel.show {
+            transform: translateY(0);
+        }
+
+        .save-panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 998;
+        }
+
+        .save-panel-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .form-grid .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .form-group label {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: var(--spacing-sm);
+                padding-bottom: 120px;
+            }
+
+            .gpa-value {
+                font-size: 4rem;
+            }
+
+            .gpa-scale {
+                font-size: 1.5rem;
+            }
+
+            .subject-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .name-input,
+            .grade-select,
+            .exam-select {
+                grid-column: span 1;
+            }
+
+            .calc-btn {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                gap: var(--spacing-sm);
+            }
+        }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse-animation {
+            animation: pulse 0.3s ease;
+        }
+
+        /* ========================================
+           ACCESSIBILITY
+           ======================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--btn-action);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- GPA Display - Apple Calculator Style -->
+        <div class="gpa-display">
+            <div class="gpa-label">GPA المتوقع</div>
+            <div class="gpa-value-container">
+                <span class="gpa-value" id="final-gpa-word">--</span>
+                <span class="gpa-scale">/4.0</span>
+            </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box" id="ects-warning">
+            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30 وحدة بالضبط!
+        </div>
+
+        <!-- Subjects Section -->
+        <div class="subjects-section">
+            <h2 class="section-title">المواد الدراسية</h2>
+            <div id="subjects-container"></div>
+        </div>
+
+        <!-- Action Buttons - Apple Calculator Grid -->
+        <div class="action-buttons">
+            <button class="calc-btn btn-function" onclick="clearAll()">AC</button>
+            <button class="calc-btn btn-function" onclick="resetCurrent()">C</button>
+            <button class="calc-btn btn-function" onclick="toggleEditMode()">⚙️</button>
+            <button class="calc-btn btn-action" onclick="calculateAll()">=</button>
+        </div>
+
+        <!-- Export Button -->
+        <button class="export-btn" id="btn-export">
+            <span>📥</span>
+            <span>حفظ وتصدير النتائج</span>
+        </button>
+    </div>
+
+    <!-- Info Button (FAB) -->
+    <button class="info-btn-fab" id="btn-gpa-info" aria-label="معلومات عن GPA">?</button>
+
+    <!-- Save Panel (iOS Sheet) -->
+    <div class="save-panel-overlay" id="save-overlay" onclick="toggleSavePanel()"></div>
+    <div class="save-panel" id="save-panel">
+        <div class="modal-handle"></div>
+        <h2 style="text-align: center; margin-bottom: 20px;">حفظ النتائج</h2>
+        
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>اسم الطالب</label>
+                <input type="text" id="student-name" placeholder="اختياري...">
+            </div>
+
+            <div class="form-group">
+                <label>الجامعة</label>
+                <input type="text" id="uni-name" value="جامعة الكوفة">
+            </div>
+            <div class="form-group">
+                <label>الكلية</label>
+                <input type="text" id="college-name" value="كلية علوم الحاسوب">
+            </div>
+
+            <div class="form-group">
+                <label>القسم</label>
+                <input type="text" id="dept-name" value="علوم الحاسوب">
+            </div>
+            <div class="form-group">
+                <label>السنة الدراسية</label>
+                <select id="academic-year-select"></select>
+            </div>
+
+            <div class="form-group">
+                <label>المرحلة</label>
+                <select id="stage-name"></select>
+            </div>
+            <div class="form-group">
+                <label>الكورس (الفصل)</label>
+                <select id="semester-name"></select>
+            </div>
+        </div>
+
+        <button class="export-btn" onclick="generateTextFile()" style="margin-top: 24px;">
+            <span>💾</span>
+            <span>تصدير الملف</span>
+        </button>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="gpa-modal">
+        <div class="modal-content">
+            <div class="modal-handle"></div>
+            <button class="modal-close" id="btn-close-modal">&times;</button>
+            <h2>ما هو الـ GPA؟</h2>
+            
+            <p>معدل الـ <strong>GPA</strong> (Grade Point Average) هو المقياس العالمي لتقييم أداء الطالب الأكاديمي.</p>
+
+            <div class="modal-sub-section">
+                <h3>📌 الأهمية</h3>
+                <ul>
+                    <li>تحديد ترتيب التفوق في القسم</li>
+                    <li>القبول في برامج الدراسات العليا</li>
+                    <li>فرص العمل والمنح الدراسية</li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <div class="modal-sub-section">
+                <h3>📐 المعادلة</h3>
+                <div class="math-box">
+                    $$GPA = \frac{\sum (ECTS \times Grade)}{30}$$
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIG ===
+        const APP_CONFIG = {
+            academicYears: ["2025-2026", "2024-2025", "2023-2024", "2022-2023"],
+            stages: ["الأولى", "الثانية", "الثالثة", "الرابعة"],
+            semesters: ["الأول", "الثاني"],
+            defaultSubjects: [
+                { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
+                { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
+                { id: 'math', name: 'الرياضيات', ects: 6 },
+                { id: 'arabic', name: 'لغة عربية', ects: 3 },
+                { id: 'english', name: 'أساسيات اللغة الإنجليزية', ects: 4 },
+                { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
+            ]
+        };
+
+        const GRADES_MAP = {
+            excellence: { label: 'امتياز (90-100)', minTarget: 90, maxTarget: 100 },
+            vGood: { label: 'جيد جداً (80-89)', minTarget: 80, maxTarget: 89 },
+            good: { label: 'جيد (70-79)', minTarget: 70, maxTarget: 79 },
+            avg: { label: 'متوسط (60-69)', minTarget: 60, maxTarget: 69 },
+            acceptable: { label: 'مقبول (50-59)', minTarget: 50, maxTarget: 59 },
+            fail_fx: { label: 'راسب قيد المعالجة (45-49)', minTarget: 45, maxTarget: 49 },
+            fail_f: { label: 'راسب (0-44)', minTarget: 0, maxTarget: 44 }
+        };
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDropdowns();
+            buildSubjectCards();
+            setupEventListeners();
+            mainUpdate();
+        });
+
+        function populateDropdowns() {
+            const fill = (id, data) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = "";
+                data.forEach(item => el.add(new Option(item, item)));
+            };
+            fill('academic-year-select', APP_CONFIG.academicYears);
+            fill('stage-name', APP_CONFIG.stages);
+            fill('semester-name', APP_CONFIG.semesters);
+        }
+
+        function buildSubjectCards() {
+            const container = document.getElementById('subjects-container');
+            container.innerHTML = "";
+
+            APP_CONFIG.defaultSubjects.forEach((sub) => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.innerHTML = `
+                    <div class="subject-name">
+                        <input type="text" class="name-input" id="${sub.id}_name" value="${sub.name}" oninput="mainUpdate()">
+                    </div>
+                    <div class="subject-grid">
+                        <div class="input-group">
+                            <span class="input-label">وحدات</span>
+                            <input type="number" class="ects-input" id="${sub.id}_ects" value="${sub.ects}" min="2" max="8" oninput="mainUpdate()">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-label">السعي</span>
+                            <input type="number" class="saei-input" id="${sub.id}_saei" placeholder="50" min="0" max="50" oninput="handleSaeiChange(this, '${sub.id}')">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-label">التقدير</span>
+                            <select class="grade-select" id="${sub.id}_final_grade" onchange="handleGradeChange('${sub.id}')" disabled>
+                                <option value="">السعي</option>
+                                <option value="excellence">امتياز</option>
+                                <option value="vGood">جيد جداً</option>
+                                <option value="good">جيد</option>
+                                <option value="avg">متوسط</option>
+                                <option value="acceptable">مقبول</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="grid-column: span 3;">
+                            <span class="input-label">الفاينل المتوقع</span>
+                            <select class="exam-select" id="${sub.id}_predicted_exam" onchange="mainUpdate()" disabled>
+                                <option value="">-</option>
+                            </select>
+                        </div>
+                        <button class="gpa-result-btn" id="${sub.id}_gpa_btn" disabled>
+                            <span id="${sub.id}_gpa_text">--</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function validate(el, max) {
+            if (el.value === "") return;
+            let val = parseInt(el.value);
+            if (val > max) el.value = max;
+            if (val < 0) el.value = 0;
+        }
+
+        function handleSaeiChange(el, subjectId) {
+            validate(el, 50);
+            enableGradeSelect(subjectId);
+            updateExamDropdown(subjectId);
+            mainUpdate();
+        }
+
+        function handleGradeChange(subjectId) {
+            updateExamDropdown(subjectId);
+            mainUpdate();
+        }
+
+        function enableGradeSelect(subjectId) {
+            const saeiInput = document.getElementById(`${subjectId}_saei`);
+            const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+
+            if (saeiInput.value && parseFloat(saeiInput.value) >= 0) {
+                const saei = parseFloat(saeiInput.value);
+
+                if (saei < 14) {
+                    gradeSelect.disabled = true;
+                    gradeSelect.value = "";
+                    gradeSelect.options[0].text = "راسب";
+                } else {
+                    gradeSelect.disabled = false;
+                    updateGradeOptions(gradeSelect, saei);
+                }
+            } else {
+                gradeSelect.disabled = true;
+                gradeSelect.value = "";
+                gradeSelect.options[0].text = "السعي";
+            }
+        }
+
+        function updateGradeOptions(gradeSelect, saei) {
+            const options = gradeSelect.options;
+            let hasValidOption = false;
+
+            for (let i = 1; i < options.length; i++) {
+                const opt = options[i];
+                const gradeData = GRADES_MAP[opt.value];
+
+                if (!gradeData) continue;
+
+                const maxPossible = saei + 50;
+                const canReachMin = maxPossible >= gradeData.minTarget;
+                const canStayUnderMax = saei <= gradeData.maxTarget;
+
+                if (canReachMin && canStayUnderMax) {
+                    opt.style.display = '';
+                    opt.disabled = false;
+                    hasValidOption = true;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            }
+
+            if (!hasValidOption) {
+                options[0].text = "لا يمكن";
+            } else {
+                options[0].text = "التقدير";
+            }
+        }
+
+        function updateExamDropdown(subjectId) {
+            const saeiInput = document.getElementById(`${subjectId}_saei`);
+            const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+            const examSelect = document.getElementById(`${subjectId}_predicted_exam`);
+
+            const saei = parseFloat(saeiInput.value);
+
+            if (isNaN(saei) || saei < 14 || !gradeSelect.value) {
+                examSelect.innerHTML = '<option value="">-</option>';
+                examSelect.disabled = true;
+                return;
+            }
+
+            const gradeData = GRADES_MAP[gradeSelect.value];
+
+            let minExam = gradeData.minTarget - saei;
+            let maxExam = gradeData.maxTarget - saei;
+
+            if (gradeData.minTarget >= 50 && minExam < 25) minExam = 25;
+            if (minExam < 0) minExam = 0;
+            if (maxExam > 50) maxExam = 50;
+
+            examSelect.innerHTML = '';
+
+            if (minExam > maxExam) {
+                examSelect.innerHTML = '<option value="">-</option>';
+                examSelect.disabled = true;
+                return;
+            }
+
+            for (let i = minExam; i <= maxExam; i++) {
+                examSelect.add(new Option(i.toString(), i));
+            }
+
+            examSelect.disabled = false;
+            examSelect.value = minExam;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('btn-gpa-info').addEventListener('click', () =>
+                document.getElementById('gpa-modal').classList.add('show'));
+            document.getElementById('btn-close-modal').addEventListener('click', () =>
+                document.getElementById('gpa-modal').classList.remove('show'));
+            document.getElementById('btn-export').addEventListener('click', toggleSavePanel);
+
+            document.getElementById('gpa-modal').addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    document.getElementById('gpa-modal').classList.remove('show');
+                }
+            });
+        }
+
+        function toggleSavePanel() {
+            document.getElementById('save-panel').classList.toggle('show');
+            document.getElementById('save-overlay').classList.toggle('show');
+        }
+
+        function clearAll() {
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                document.getElementById(`${sub.id}_saei`).value = '';
+                document.getElementById(`${sub.id}_final_grade`).value = '';
+                document.getElementById(`${sub.id}_final_grade`).disabled = true;
+                document.getElementById(`${sub.id}_predicted_exam`).innerHTML = '<option value="">-</option>';
+                document.getElementById(`${sub.id}_predicted_exam`).disabled = true;
+                document.getElementById(`${sub.id}_gpa_text`).innerText = '--';
+                document.getElementById(`${sub.id}_gpa_btn`).disabled = true;
+                document.getElementById(`${sub.id}_gpa_btn`).className = 'gpa-result-btn';
+            });
+            mainUpdate();
+        }
+
+        function resetCurrent() {
+            // Reset last edited subject
+        }
+
+        function toggleEditMode() {
+            const isEditable = document.querySelectorAll('.ects-input')[0].readOnly !== true;
+            document.querySelectorAll('.ects-input, .name-input').forEach(input => {
+                input.readOnly = !isEditable;
+                input.style.opacity = isEditable ? '0.5' : '1';
+            });
+        }
+
+        function calculateAll() {
+            mainUpdate();
+            document.querySelectorAll('.gpa-result-btn').forEach(btn => {
+                btn.classList.add('pulse-animation');
+                setTimeout(() => btn.classList.remove('pulse-animation'), 300);
+            });
+        }
+
+        function mainUpdate() {
+            let totalWeightedScore = 0;
+            let sumEcts = 0;
+            let isEctsValid = true;
+            let allSubjectsCompleted = true;
+
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                const ectsInput = document.getElementById(`${sub.id}_ects`);
+                const saeiInput = document.getElementById(`${sub.id}_saei`);
+                const gradeSelect = document.getElementById(`${sub.id}_final_grade`);
+                const examSelect = document.getElementById(`${sub.id}_predicted_exam`);
+                const textGrade = document.getElementById(`${sub.id}_gpa_text`);
+                const gpaBtn = document.getElementById(`${sub.id}_gpa_btn`);
+
+                let ectsVal = parseInt(ectsInput.value) || 0;
+                if (ectsVal < 2 || ectsVal > 8) {
+                    ectsInput.style.boxShadow = "0 0 0 3px rgba(255, 69, 58, 0.3)";
+                    isEctsValid = false;
+                } else {
+                    ectsInput.style.boxShadow = "none";
+                }
+                sumEcts += ectsVal;
+
+                const saei = parseFloat(saeiInput.value);
+                const predictedExam = parseFloat(examSelect.value);
+
+                if (isNaN(saei) || saei < 0) {
+                    textGrade.innerText = "--";
+                    gpaBtn.disabled = true;
+                    gpaBtn.className = 'gpa-result-btn';
+                    allSubjectsCompleted = false;
+                    return;
+                }
+
+                if (saei < 14) {
+                    textGrade.innerText = "راسب";
+                    gpaBtn.className = 'gpa-result-btn grade-fail';
+                    gpaBtn.disabled = false;
+                    totalWeightedScore += (saei * ectsVal);
+                    return;
+                }
+
+                if (gradeSelect.value === "" || isNaN(predictedExam)) {
+                    textGrade.innerText = "--";
+                    gpaBtn.disabled = true;
+                    gpaBtn.className = 'gpa-result-btn';
+                    allSubjectsCompleted = false;
+                    return;
+                }
+
+                const totalScore = saei + predictedExam;
+
+                textGrade.innerText = totalScore.toFixed(0);
+                gpaBtn.disabled = false;
+                applyColorToButton(gpaBtn, totalScore);
+                totalWeightedScore += (totalScore * ectsVal);
+            });
+
+            const warningDiv = document.getElementById('ects-warning');
+            const finalGpaElement = document.getElementById('final-gpa-word');
+
+            if (allSubjectsCompleted && sumEcts === 30 && isEctsValid) {
+                const gpa = parseFloat((totalWeightedScore / sumEcts).toFixed(2));
+                finalGpaElement.innerText = gpa.toFixed(2);
+            } else {
+                finalGpaElement.innerText = "--";
+            }
+
+            if (sumEcts !== 30 || !isEctsValid) {
+                warningDiv.style.display = 'block';
+                document.getElementById('current-ects-sum').innerText = sumEcts;
+            } else {
+                warningDiv.style.display = 'none';
+            }
+        }
+
+        function applyColorToButton(button, score) {
+            button.className = 'gpa-result-btn';
+            if (score >= 90) button.classList.add("grade-excellent");
+            else if (score >= 80) button.classList.add("grade-vgood");
+            else if (score >= 70) button.classList.add("grade-good");
+            else if (score >= 60) button.classList.add("grade-avg");
+            else if (score >= 50) button.classList.add("grade-acceptable");
+            else button.classList.add("grade-fail");
+        }
+
+        function generateTextFile() {
+            const getVal = id => document.getElementById(id).value.trim() || "-";
+            const studentName = getVal('student-name');
+
+            const academicYearDisplay = document.getElementById('academic-year-select').value;
+
+            let content = `اسم الطالب: ${studentName}\r\nالجامعة: ${getVal('uni-name')}\r\nالكلية: ${getVal('college-name')}\r\nالقسم: ${getVal('dept-name')}\r\nالسنة الدراسية: ${academicYearDisplay} | المرحلة: ${getVal('stage-name')} | الفصل: ${getVal('semester-name')}\r\n`;
+            content += `--------------------------------------------------\r\n\r\n`;
+
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                const ects = document.getElementById(`${sub.id}_ects`).value;
+                const currentName = document.getElementById(`${sub.id}_name`).value;
+                const saei = document.getElementById(`${sub.id}_saei`).value || "-";
+                const gradeKey = document.getElementById(`${sub.id}_final_grade`).value;
+                const examSelectValue = document.getElementById(`${sub.id}_predicted_exam`).value;
+
+                let gradeLabel = "--";
+                let totalScoreDisplay = "-";
+                let predictedExamDisplay = "-";
+
+                if (saei !== "-") {
+                    const saeiNum = parseFloat(saei);
+                    if (saeiNum < 14) {
+                        gradeLabel = "راسب";
+                        totalScoreDisplay = saei;
+                    } else if (gradeKey && examSelectValue !== "") {
+                        gradeLabel = GRADES_MAP[gradeKey].label;
+                        const predictedExamNum = parseFloat(examSelectValue);
+                        const totalScore = saeiNum + predictedExamNum;
+
+                        totalScoreDisplay = totalScore.toFixed(0);
+                        predictedExamDisplay = predictedExamNum.toFixed(0);
+                    }
+                }
+
+                content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي: ${saei}\r\nالتقدير: ${gradeLabel}\r\nالفاينل: ${predictedExamDisplay}\r\nالدرجة: ${totalScoreDisplay}\r\n\r\n`;
+            });
+
+            const finalGpaText = document.getElementById('final-gpa-word').innerText;
+            content += `--------------------------------------------------\r\nالمعدل الفصلي (GPA): ${finalGpaText}\r\n`;
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+            link.download = studentName !== "-" ? `نتيجة_${studentName.replace(/\s+/g, '_')}.txt` : `نتيجة_طالب.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            toggleSavePanel();
+        }
+    </script>
+</body>
+</html>

@@ -1,64 +1,133 @@
-/* --- الإعدادات العامة --- */
+/* ========================================
+   APPLE/SAMSUNG CALCULATOR DARK THEME
+   Spreadsheet-style GPA Calculator
+   ======================================== */
+
+/* --- CSS Variables - Dark Theme Palette --- */
+:root {
+    /* Background Colors */
+    --bg-app: #000000;
+    --bg-card: #1C1C1C;
+    --bg-surface: #2C2C2C;
+    
+    /* Apple Calculator Button Colors */
+    --btn-number: #333333;
+    --btn-number-active: #737373;
+    --btn-function: #A5A5A5;
+    --btn-function-active: #D9D9D9;
+    --btn-action: #FF9F0A;
+    --btn-action-active: #FFB84D;
+    
+    /* Text Colors */
+    --text-primary: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --text-disabled: #5A5A5A;
+    
+    /* Border & Divider */
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-focus: #FF9F0A;
+    
+    /* Grade Colors (Vibrant, Apple-style) */
+    --grade-excellent-bg: rgba(48, 209, 88, 0.2);
+    --grade-excellent-text: #30D158;
+    --grade-vgood-bg: rgba(10, 132, 255, 0.2);
+    --grade-vgood-text: #0A84FF;
+    --grade-good-bg: rgba(94, 92, 230, 0.2);
+    --grade-good-text: #5E5CE6;
+    --grade-avg-bg: rgba(255, 214, 10, 0.2);
+    --grade-avg-text: #FFD60A;
+    --grade-acceptable-bg: rgba(255, 159, 10, 0.2);
+    --grade-acceptable-text: #FF9F0A;
+    --grade-fail-bg: rgba(255, 69, 58, 0.2);
+    --grade-fail-text: #FF453A;
+    
+    /* Spacing */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Reset & Base --- */
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    background: linear-gradient(135deg, #37474f 0%, #455a64 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+    background: var(--bg-app);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 15px;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    padding: 15px;
 }
 
-/* الحاوية الرئيسية */
+/* --- Main Container --- */
 .app-container {
-    background-color: #f0f0f0;
-    border: 2px solid #a0a0a0;
-    border-top-color: #ffffff;
-    border-left-color: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.5);
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 24px;
     width: 100%;
-    max-width: 950px;
+    max-width: 1000px;
+    box-shadow: var(--shadow-lg);
 }
 
-/* --- الشاشة العلوية للمعدل --- */
+/* --- GPA Display Screen --- */
 .gpa-screen {
-    background: linear-gradient(135deg, #f4fdf4 0%, #e8f5e9 100%);
-    border: 3px solid #a0a0a0;
-    border-bottom-color: #ffffff;
-    border-right-color: #ffffff;
-    min-height: 120px;
+    background: linear-gradient(135deg, #1C1C1C 0%, #2C2C2C 100%);
+    border-radius: var(--radius-xl);
+    padding: 32px 24px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-    border-radius: 8px;
+    border: 1px solid var(--border-light);
 }
 
 .gpa-label {
-    font-size: 1.2rem;
-    color: #555;
-    font-weight: bold;
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
 }
 
 .gpa-value {
-    font-size: 3.5rem;
-    font-weight: bold;
-    color: #2e7d32;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    font-family: 'Courier New', monospace;
+    font-size: 4.5rem;
+    font-weight: 300;
+    color: var(--grade-excellent-text);
+    font-feature-settings: 'tnum' on, 'lnum' on;
+    letter-spacing: -2px;
+    line-height: 1;
+    transition: color 0.3s ease;
 }
 
-/* --- أزرار التحكم الملونة --- */
+/* --- Warning Box --- */
+.warning-box {
+    background: rgba(255, 69, 58, 0.15);
+    color: var(--grade-fail-text);
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 18px;
+    display: none;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+/* --- Controls Container --- */
 .controls-container {
     display: flex;
     flex-direction: column;
@@ -67,254 +136,290 @@ body {
 }
 
 .controls {
-    padding: 14px 16px;
-    border-radius: 6px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     display: flex;
     align-items: center;
     cursor: pointer;
-    border: 2px solid;
-    transition: all 0.3s ease;
+    border: 1px solid var(--border-light);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
 }
 
 .controls:hover {
-    transform: translateX(-3px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: #3A3A3A;
+    border-color: var(--btn-function);
 }
 
 .controls.edit-ects {
-    background-color: #f3e5f5;
-    border-color: #ba68c8;
-    color: #4a148c;
+    border-color: rgba(165, 165, 165, 0.3);
 }
 
 .controls.edit-names {
-    background-color: #fff3e0;
-    border-color: #ffb74d;
-    color: #e65100;
+    border-color: rgba(255, 159, 10, 0.3);
 }
 
 .controls input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
-    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    margin-left: 12px;
     cursor: pointer;
-    accent-color: #2e7d32;
-}
-
-/* رسالة الخطأ للوحدات */
-.warning-box {
-    background-color: #d32f2f;
-    color: white;
-    padding: 12px;
+    accent-color: var(--btn-action);
     border-radius: 6px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 15px;
-    display: none;
-    animation: slideIn 0.3s ease;
-    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- الجدول المتجاوب --- */
+/* --- Table Container --- */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
-    min-width: 700px;
+    background-color: transparent;
+    min-width: 800px;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px 10px;
-    text-align: center;
-    font-size: 0.95rem;
-}
-
+/* --- Table Headers --- */
 th {
-    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
-    color: white;
-    font-weight: 700;
-    border: 1px solid #2e7d32;
-    letter-spacing: 0.3px;
-}
-
-tr:hover {
-    background-color: #f9f9f9;
-}
-
-/* --- حقول الإدخال --- */
-input[type="number"] {
-    width: 70px;
-    padding: 8px;
-    border: 1px solid #ccc;
+    background: var(--btn-function);
+    color: var(--text-primary);
+    padding: 16px 12px;
     text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+th:first-child {
+    border-radius: 0 var(--radius-sm) 0 0;
+    text-align: right;
+}
+
+th:last-child {
+    border-radius: var(--radius-sm) 0 0 0;
+}
+
+/* --- Table Cells --- */
+td {
+    border: 1px solid var(--border-light);
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+    background: var(--bg-card);
+}
+
+td:first-child {
+    text-align: right;
+}
+
+tr:hover td {
+    background: #252525;
+}
+
+/* --- Input Fields - Apple Calculator Style --- */
+input[type="number"],
+input[type="text"] {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     font-size: 1rem;
+    font-weight: 400;
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--btn-number);
+    color: var(--text-primary);
     outline: none;
-    border-radius: 4px;
+    text-align: center;
+    width: 100%;
     transition: all 0.2s ease;
 }
 
-input[type="number"]:focus {
-    background-color: #e8f5e9;
-    border-color: #2e7d32;
-    box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+input[type="number"]:focus,
+input[type="text"]:focus {
+    border-color: var(--btn-action);
+    background: #3A3A3A;
+    box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.2);
 }
 
-/* إخفاء حدود حقول الأسماء والوحدات حتى يتم تفعيل التعديل */
+input[type="number"]:disabled,
+input[type="text"]:disabled {
+    background: #252525;
+    color: var(--text-secondary);
+    border-color: transparent;
+    cursor: default;
+}
+
+/* Specific Input Styles */
 .ects-input, .name-input {
     border: none !important;
     background: transparent !important;
-    font-weight: 600;
-    color: #333;
-    cursor: default;
+    font-weight: 500;
+    color: var(--text-primary);
     text-align: center;
     font-family: inherit;
     font-size: 1rem;
     width: 100%;
-    box-sizing: border-box;
-    padding: 6px 4px;
+    padding: 8px 4px;
 }
 
 .ects-input {
-    width: 55px;
+    width: 60px;
 }
 
 .name-input {
     min-width: 140px;
+    text-align: right;
 }
 
 .ects-input.editable, .name-input.editable {
-    border: 2px solid #ffc107 !important;
-    background-color: #fffde7 !important;
+    border: 2px solid var(--btn-action) !important;
+    background: #2C2C2C !important;
     cursor: text;
-    padding: 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
 }
 
 .ects-input.error {
-    border: 2px solid red !important;
-    color: red !important;
+    border: 2px solid var(--grade-fail-text) !important;
+    color: var(--grade-fail-text) !important;
+    box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.2);
 }
 
-/* Select (اختيار التقديرات) */
+/* --- Select Dropdowns --- */
 select {
-    padding: 8px 10px;
-    font-size: 0.95rem;
+    padding: 10px 14px;
+    font-size: 0.9375rem;
     font-family: inherit;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
     outline: none;
-    background-color: #fff;
+    background: var(--btn-action);
+    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 160px;
+    min-width: 150px;
+    font-weight: 500;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+    padding-left: 38px;
 }
 
-select:hover {
-    border-color: #2e7d32;
-    background-color: #f5f5f5;
+select:hover:not(:disabled) {
+    background: var(--btn-action-active);
 }
 
 select:focus {
-    border-color: #2e7d32;
-    box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+    background: var(--btn-action-active);
+    box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.3);
 }
 
-/* --- ألوان التقديرات --- */
+select:disabled {
+    background: #2C2C2C;
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    padding: 10px;
+}
+
+/* --- Grade Colors --- */
 .grade-excellent {
-    background-color: #c8e6c9;
-    color: #1b5e20;
-    font-weight: bold;
+    background-color: var(--grade-excellent-bg) !important;
+    color: var(--grade-excellent-text);
+    font-weight: 600;
 }
 
 .grade-vgood {
-    background-color: #a5d6a7;
-    color: #1b5e20;
-    font-weight: bold;
+    background-color: var(--grade-vgood-bg) !important;
+    color: var(--grade-vgood-text);
+    font-weight: 600;
 }
 
 .grade-good {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+    background-color: var(--grade-good-bg) !important;
+    color: var(--grade-good-text);
     font-weight: 600;
 }
 
 .grade-avg {
-    background-color: #fff9c4;
-    color: #f57f17;
+    background-color: var(--grade-avg-bg) !important;
+    color: var(--grade-avg-text);
     font-weight: 600;
 }
 
 .grade-acceptable {
-    background-color: #ffe0b2;
-    color: #e65100;
+    background-color: var(--grade-acceptable-bg) !important;
+    color: var(--grade-acceptable-text);
     font-weight: 600;
 }
 
 .grade-fail {
-    background-color: #ffcdd2;
-    color: #b71c1c;
-    font-weight: bold;
+    background-color: var(--grade-fail-bg) !important;
+    color: var(--grade-fail-text);
+    font-weight: 600;
 }
 
-/* --- قسم الحفظ السفلي --- */
+/* --- Collapsible Container --- */
 .collapsible-container {
-    border: 1px solid #c0c0c0;
-    border-radius: 6px;
-    background-color: #e6e6e6;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
     overflow: hidden;
     margin-top: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-tab-btn {
     width: 100%;
-    background: linear-gradient(135deg, #cfd8dc 0%, #b0bec5 100%);
-    color: #37474f;
+    background: var(--btn-function);
+    color: var(--text-primary);
     border: none;
-    padding: 16px;
-    font-size: 1.1rem;
-    font-weight: bold;
+    padding: 18px 20px;
+    font-size: 1rem;
+    font-weight: 600;
     font-family: inherit;
     text-align: right;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .toggle-tab-btn:hover {
-    background: linear-gradient(135deg, #b0bec5 0%, #90a4ae 100%);
+    background: var(--btn-function-active);
+    color: var(--text-primary);
+}
+
+.toggle-tab-btn:active {
+    transform: scale(0.99);
 }
 
 .footer-section {
-    padding: 20px;
+    padding: 24px;
     display: none;
     flex-direction: column;
-    gap: 20px;
-    border-top: 1px solid #c0c0c0;
+    gap: 18px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-card);
 }
 
 .footer-section.show {
@@ -325,114 +430,129 @@ select:focus {
 @keyframes slideDown {
     from {
         opacity: 0;
-        max-height: 0;
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
-        max-height: 500px;
+        transform: translateY(0);
     }
 }
 
+/* --- Info Grid (Form) --- */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 16px;
 }
 
 .info-grid .full-width {
     grid-column: span 2;
-    display: flex;
-    flex-direction: column;
 }
 
 .info-grid label {
     display: flex;
     flex-direction: column;
-    font-size: 0.95rem;
-    color: #333;
+    font-size: 0.8125rem;
     font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.info-grid input[type="text"], .info-grid select {
-    padding: 10px;
-    margin-top: 8px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
+.info-grid input[type="text"],
+.info-grid select {
+    margin-top: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 1rem;
+    background: var(--btn-number);
+    color: var(--text-primary);
     transition: all 0.2s ease;
 }
 
-.info-grid input[type="text"]:focus, .info-grid select:focus {
-    border-color: #2e7d32;
-    background-color: #f5f5f5;
-    box-shadow: 0 0 4px rgba(46, 125, 50, 0.2);
+.info-grid input[type="text"]:focus,
+.info-grid select:focus {
+    border-color: var(--btn-action);
+    background: #3A3A3A;
+    box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.2);
 }
 
+/* --- Export Button --- */
 .btn-success {
     width: 100%;
-    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-    color: white;
+    background: var(--btn-action);
+    color: var(--text-primary);
     border: none;
-    border-radius: 6px;
-    padding: 16px;
+    border-radius: var(--radius-md);
+    padding: 16px 24px;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 1.1rem;
+    font-weight: 600;
+    font-size: 1.0625rem;
     font-family: inherit;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+    transition: all 0.2s ease;
+    margin-top: 8px;
 }
 
 .btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+    background: var(--btn-action-active);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-success:active {
     transform: translateY(0);
+    box-shadow: var(--shadow-sm);
 }
 
-/* --- الزر العائم --- */
+/* --- Floating Info Button --- */
 .info-btn-container {
     position: fixed;
-    left: 30px;
-    bottom: 30px;
-    background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
-    color: white;
-    width: 90px;
-    height: 90px;
-    border-radius: 15px;
+    left: 24px;
+    bottom: 24px;
+    background: var(--btn-function);
+    color: var(--text-primary);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.2s ease;
     z-index: 100;
     border: none;
 }
 
 .info-btn-container:hover {
-    transform: scale(1.12);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    background: var(--btn-function-active);
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+.info-btn-container:active {
+    transform: scale(0.95);
 }
 
 .info-icon {
-    font-size: 2.8rem;
-    font-weight: bold;
+    font-size: 1.75rem;
+    font-weight: 700;
     line-height: 1;
 }
 
 .info-text {
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-top: 6px;
-    text-align: center;
+    font-size: 0.625rem;
+    font-weight: 600;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* --- النافذة المنبثقة (Modal) --- */
+/* --- Modal Overlay --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -446,8 +566,9 @@ select:focus {
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease;
-    padding: 10px;
+    padding: 20px;
     box-sizing: border-box;
+    backdrop-filter: blur(5px);
 }
 
 .modal-overlay.show {
@@ -455,20 +576,21 @@ select:focus {
     opacity: 1;
 }
 
+/* --- Modal Content --- */
 .modal-content {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
+    background: var(--bg-card);
+    padding: 32px;
+    border-radius: var(--radius-xl);
     width: 100%;
-    max-width: 650px;
+    max-width: 580px;
     max-height: 85vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-    transform: translateY(-20px);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px);
     transition: transform 0.3s ease;
-    color: #333;
-    direction: rtl;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
 }
 
 .modal-overlay.show .modal-content {
@@ -477,79 +599,87 @@ select:focus {
 
 .close-modal {
     position: absolute;
-    top: 15px;
-    left: 20px;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #999;
+    top: 16px;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 300;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: all 0.2s ease;
     border: none;
-    background: none;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-modal:hover {
-    color: #d32f2f;
+    background: var(--grade-fail-bg);
+    color: var(--grade-fail-text);
 }
 
 .modal-content h2 {
-    color: #1976d2;
-    margin-top: 0;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 15px;
-    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin: 0 0 16px 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
 }
 
 .modal-content p {
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
     margin-bottom: 18px;
-    color: #555;
 }
 
 .modal-content ul {
-    padding-right: 25px;
+    padding-right: 20px;
     margin-bottom: 0;
 }
 
 .modal-content li {
-    margin-bottom: 15px;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #555;
+    margin-bottom: 10px;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
 .modal-content hr {
     border: 0;
-    border-top: 1px solid #eee;
-    margin: 20px 0;
+    border-top: 1px solid var(--border-light);
+    margin: 24px 0;
 }
 
 .modal-sub-section h3 {
-    color: #2e7d32;
-    font-size: 1.3rem;
-    margin: 15px 0 10px 0;
+    color: var(--text-primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 20px 0 10px 0;
 }
 
 .math-box {
-    background: #f9f9f9;
-    padding: 18px;
-    border-radius: 8px;
-    border: 2px solid #e0e0e0;
+    background: var(--bg-surface);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
     margin: 18px 0;
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
 }
 
-/* --- التجاوب مع شاشات الموبايل --- */
+/* --- Responsive Design --- */
 @media (max-width: 768px) {
     .app-container {
-        padding: 15px;
+        padding: 18px;
     }
 
     .gpa-value {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .info-grid {
@@ -561,40 +691,84 @@ select:focus {
     }
 
     .info-btn-container {
-        width: 70px;
-        height: 70px;
-        left: 15px;
-        bottom: 15px;
+        width: 56px;
+        height: 56px;
+        left: 16px;
+        bottom: 16px;
     }
 
     .info-icon {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
 
     .info-text {
-        font-size: 0.65rem;
+        font-size: 0.5625rem;
+    }
+
+    th, td {
+        padding: 10px 8px;
+        font-size: 0.875rem;
+    }
+
+    input[type="number"] {
+        width: 65px;
+        font-size: 0.9375rem;
+    }
+
+    select {
+        min-width: 130px;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .app-container {
+        padding: 16px;
+        border-radius: var(--radius-lg);
+    }
+
+    .gpa-screen {
+        padding: 24px 18px;
+        min-height: 100px;
+    }
+
+    .gpa-label {
+        font-size: 0.8125rem;
+    }
+
+    .gpa-value {
+        font-size: 2.5rem;
+    }
+
+    table {
+        min-width: 650px;
+        font-size: 0.8125rem;
     }
 
     th, td {
         padding: 8px 6px;
-        font-size: 0.85rem;
+        font-size: 0.8125rem;
     }
 
     input[type="number"] {
-        width: 60px;
-        padding: 6px;
-        font-size: 0.9rem;
+        width: 55px;
+        padding: 8px 6px;
+        font-size: 0.875rem;
     }
 
     select {
-        min-width: 140px;
-        font-size: 0.9rem;
-        padding: 6px 8px;
+        min-width: 120px;
+        font-size: 0.8125rem;
+        padding: 8px 10px;
     }
 
     .controls {
-        padding: 12px;
-        font-size: 0.9rem;
+        padding: 12px 14px;
+        font-size: 0.875rem;
     }
 
     .controls input[type="checkbox"] {
@@ -603,83 +777,33 @@ select:focus {
     }
 
     .modal-content {
-        padding: 20px;
+        padding: 24px;
     }
 
     .modal-content h2 {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
     }
 }
 
-@media (max-width: 480px) {
-    body {
-        padding: 8px;
+/* --- Accessibility --- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
+}
 
-    .app-container {
-        padding: 12px;
-        border-radius: 4px;
-    }
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--btn-action);
+    outline-offset: 2px;
+}
 
-    .gpa-screen {
-        min-height: 100px;
-        margin-bottom: 15px;
-    }
-
-    .gpa-label {
-        font-size: 1rem;
-        margin-bottom: 5px;
-    }
-
-    .gpa-value {
-        font-size: 2rem;
-    }
-
-    table {
-        min-width: 600px;
-        font-size: 0.8rem;
-    }
-
-    th, td {
-        padding: 6px 4px;
-        font-size: 0.75rem;
-    }
-
-    input[type="number"] {
-        width: 50px;
-        padding: 4px;
-        font-size: 0.8rem;
-    }
-
-    select {
-        min-width: 120px;
-        font-size: 0.8rem;
-        padding: 4px 6px;
-    }
-
-    .info-btn-container {
-        width: 65px;
-        height: 65px;
-        left: 10px;
-        bottom: 10px;
-    }
-
-    .info-icon {
-        font-size: 1.5rem;
-    }
-
-    .info-text {
-        font-size: 0.6rem;
-    }
-
-    .controls {
-        padding: 10px;
-        font-size: 0.85rem;
-    }
-
-    .controls input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
+@media (prefers-contrast: high) {
+    :root {
+        --border-light: #FFFFFF;
+        --text-secondary: #FFFFFF;
     }
 }

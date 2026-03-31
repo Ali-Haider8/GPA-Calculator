@@ -1,10 +1,10 @@
 // نظام التقديرات والدرجات المقابلة
 const GRADES_MAP = {
-    excellence: { label: 'امتياز', min: 90, max: 100 },
-    vGood: { label: 'جيد جداً', min: 80, max: 90 },
-    good: { label: 'جيد', min: 70, max: 80 },
-    avg: { label: 'متوسط', min: 60, max: 70 },
-    acceptable: { label: 'مقبول', min: 50, max: 60 }
+    excellence: { label: 'امتياز', value: 95, examBase: 40, examScale: 10 },  // Exam = 40 + (ratio × 10)
+    vGood: { label: 'جيد جداً', value: 85, examBase: 35, examScale: 15 },     // Exam = 35 + (ratio × 15)
+    good: { label: 'جيد', value: 75, examBase: 30, examScale: 20 },           // Exam = 30 + (ratio × 20)
+    avg: { label: 'متوسط', value: 65, examBase: 25, examScale: 25 },          // Exam = 25 + (ratio × 25)
+    acceptable: { label: 'مقبول', value: 55, examBase: 20, examScale: 30 }    // Exam = 20 + (ratio × 30)
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -39,7 +39,6 @@ function updateAcademicYear() {
     const endVal = endInput.value;
     
     if (startVal && endVal) {
-        // يمكن استخدام هذه الدالة لتحديث قيمة مخفية أو للتحقق
         console.log(`السنة الدراسية: ${startVal}-${endVal}`);
     }
 }
@@ -47,7 +46,7 @@ function updateAcademicYear() {
 function buildTable() {
     const tbody = document.getElementById('subjects-body');
     tbody.innerHTML = "";
-    
+
     APP_CONFIG.defaultSubjects.forEach((sub, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -58,11 +57,14 @@ function buildTable() {
                 <select id="${sub.id}_final_grade" onchange="mainUpdate()" disabled>
                     <option value="">-- أدخل السعي أولاً --</option>
                     <option value="excellence">امتياز (90-100)</option>
-                    <option value="vGood">جيد جداً (80-90)</option>
-                    <option value="good">جيد (70-80)</option>
-                    <option value="avg">متوسط (60-70)</option>
-                    <option value="acceptable">مقبول (50-60)</option>
+                    <option value="vGood">جيد جداً (80-89)</option>
+                    <option value="good">جيد (70-79)</option>
+                    <option value="avg">متوسط (60-69)</option>
+                    <option value="acceptable">مقبول (50-59)</option>
                 </select>
+            </td>
+            <td id="${sub.id}_predicted_exam_cell" style="font-size: 0.85rem; color: #666;">
+                <span id="${sub.id}_predicted_exam">-</span>
             </td>
             <td id="${sub.id}_gpa_cell">
                 <span id="${sub.id}_gpa_text">--</span>
@@ -82,17 +84,81 @@ function validate(el, max) {
 function enableGradeSelect(subjectId) {
     const saeiInput = document.getElementById(`${subjectId}_saei`);
     const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
-    
+    const gpaText = document.getElementById(`${subjectId}_gpa_text`);
+    const gpaCell = document.getElementById(`${subjectId}_gpa_cell`);
+    const predictedExamText = document.getElementById(`${subjectId}_predicted_exam`);
+    const predictedExamCell = document.getElementById(`${subjectId}_predicted_exam_cell`);
+
     if (saeiInput.value && parseFloat(saeiInput.value) > 0) {
         gradeSelect.disabled = false;
         gradeSelect.options[0].text = "-- اختر التقدير --";
+
+        // حساب الدرجة النهائية المتوقعة بناءً على السعي
+        const saei = parseFloat(saeiInput.value);
+        const saeiRatio = saei / 50;
+        
+        // عرض درجة الامتحان المتوقعة للتقدير "امتياز" كقيمة افتراضية
+        const excellenceData = GRADES_MAP.excellence;
+        const predictedExam = Math.min(50, excellenceData.examBase + (saeiRatio * excellenceData.examScale));
+        predictedExamText.innerText = predictedExam.toFixed(1);
+        predictedExamCell.style.display = "";
+        
+        // تحديث خيارات التقدير بناءً على السعي
+        updateGradeOptions(gradeSelect, saei, saeiRatio);
     } else {
         gradeSelect.disabled = true;
         gradeSelect.value = "";
         gradeSelect.options[0].text = "-- أدخل السعي أولاً --";
-        document.getElementById(`${subjectId}_gpa_text`).innerText = "--";
-        document.getElementById(`${subjectId}_gpa_cell`).className = "";
+        gpaText.innerText = "--";
+        gpaCell.className = "";
+        predictedExamText.innerText = "-";
+        predictedExamCell.style.display = "none";
     }
+}
+
+function updateGradeOptions(gradeSelect, saei, saeiRatio) {
+    // تحديد التقديرات المتاحة بناءً على السعي
+    const options = gradeSelect.options;
+    
+    // إخفاء/إظهار الخيارات بناءً على إمكانية تحقيق التقدير
+    for (let i = 1; i < options.length; i++) {
+        const opt = options[i];
+        const gradeData = GRADES_MAP[opt.value];
+        
+        if (!gradeData) continue;
+        
+        // حساب درجة الامتحان المتوقعة باستخدام الصيغة التناسبية
+        // Exam = base + (ratio × scale)، مع حد أقصى 50
+        const predictedExam = Math.min(50, gradeData.examBase + (saeiRatio * gradeData.examScale));
+        const totalScore = saei + predictedExam;
+        
+        // التحقق من إمكانية تحقيق هذا التقدير
+        let min, max;
+        switch(opt.value) {
+            case 'excellence': min = 90; max = 100; break;
+            case 'vGood': min = 80; max = 89; break;
+            case 'good': min = 70; max = 79; break;
+            case 'avg': min = 60; max = 69; break;
+            case 'acceptable': min = 50; max = 59; break;
+            default: min = 0; max = 100;
+        }
+        
+        // إظهار الخيار فقط إذا كانت الدرجة المتوقعة ضمن نطاق التقدير
+        // أو إذا كان السعي يسمح بالوصول إلى الحد الأدنى للتقدير
+        const achievableMin = saei + gradeData.examBase; // أقل درجة ممكنة لهذا التقدير
+        const achievableMax = saei + 50; // أعلى درجة ممكنة (امتحان كامل)
+        
+        if (achievableMax >= min && achievableMin <= max) {
+            opt.style.display = '';
+            opt.disabled = false;
+        } else {
+            opt.style.display = 'none';
+            opt.disabled = true;
+        }
+    }
+    
+    // إعادة تعيين الاختيار
+    gradeSelect.value = "";
 }
 
 function setupEventListeners() {
@@ -118,7 +184,9 @@ function mainUpdate() {
         const gradeSelect = document.getElementById(`${sub.id}_final_grade`);
         const textGrade = document.getElementById(`${sub.id}_gpa_text`);
         const gpaCell = document.getElementById(`${sub.id}_gpa_cell`);
-        
+        const predictedExamText = document.getElementById(`${sub.id}_predicted_exam`);
+        const predictedExamCell = document.getElementById(`${sub.id}_predicted_exam_cell`);
+
         // التحقق من الوحدات
         let ectsVal = parseInt(ectsInput.value) || 0;
         if (ectsVal < 2 || ectsVal > 8) {
@@ -131,31 +199,38 @@ function mainUpdate() {
 
         // معالجة التقديرات
         const saei = parseFloat(saeiInput.value) || 0;
-        
+
         // إذا لم يتم إدخال السعي، لا تعرض شيئاً
         if (!saeiInput.value || saei === 0) {
             textGrade.innerText = "--";
             gpaCell.className = "";
+            predictedExamText.innerText = "-";
+            predictedExamCell.style.display = "none";
             return;
         }
-        
+
         gpaCell.className = "";
-        
+        predictedExamCell.style.display = "";
+
         if (gradeSelect.value === "") {
             textGrade.innerText = "--";
+            predictedExamText.innerText = "-";
             return;
         }
 
         const selectedGrade = GRADES_MAP[gradeSelect.value];
-        
-        // حساب الدرجة الدقيقة في الامتحان النهائي بناءً على السعي
-        // كلما كان السعي أعلى، كانت درجة الامتحان أقرب للحد الأقصى للتقدير
-        // المعادلة: درجة الامتحان = الحد الأدنى + (نسبة السعي من 50 * مدى الـ 10 درجات)
-        const saeRatio = saei / 50; // نسبة السعي من 50
-        const examScore = selectedGrade.min + (saeRatio * 10);
-        
-        // الدرجة النهائية = السعي + درجة الامتحان المحسوبة
-        const totalScore = saei + examScore;
+
+        // حساب الدرجة النهائية باستخدام الصيغة التناسبية الديناميكية:
+        // مفهوم أساسي: الامتحان النهائي من 50، والسعي من 50، والمجموع من 100
+        // العلاقة تناسبية مباشرة: كلما زاد السعي، اقتربت درجة الامتحان من 50/50
+        // Exam = base + (saei_ratio × scale)، مع حد أقصى 50
+        // المجموع الكلي لا يتجاوز 100 أبداً
+        const saeiRatio = saei / 50;
+        const predictedExam = Math.min(50, selectedGrade.examBase + (saeiRatio * selectedGrade.examScale));
+        const totalScore = Math.min(100, saei + predictedExam);
+
+        // عرض درجة الامتحان المتوقعة
+        predictedExamText.innerText = predictedExam.toFixed(1);
 
         // عرض المعدل الرقمي للمادة (GPA للمادة)
         textGrade.innerText = totalScore.toFixed(2);
@@ -167,7 +242,7 @@ function mainUpdate() {
     const warningDiv = document.getElementById('ects-warning');
     const finalGpaElement = document.getElementById('final-gpa-word');
     const gpaScreen = document.getElementById('screen-container');
-    
+
     // التحقق مما إذا كانت جميع المواد قد أدخلت درجاتها
     let allSubjectsCompleted = true;
     APP_CONFIG.defaultSubjects.forEach(sub => {
@@ -177,37 +252,34 @@ function mainUpdate() {
             allSubjectsCompleted = false;
         }
     });
-    
-    // إظهار شاشة GPA فقط بعد إدخال جميع الدرجات
-    if (allSubjectsCompleted && sumEcts === 30 && isEctsValid) {
-        gpaScreen.style.display = 'block';
+
+    // إظهار شاشة GPA دائماً، وتحديث القيمة بشكل فوري
+    gpaScreen.style.display = 'block';
+
+    // حساب وعرض المعدل الرقمي (حتى لو لم تكتمل جميع الدرجات)
+    if (totalWeightedScore > 0 && sumEcts > 0) {
+        const gpa = parseFloat((totalWeightedScore / sumEcts).toFixed(2));
+        finalGpaElement.innerText = gpa.toFixed(2);
+
+        // تطبيق الألوان حسب المعدل - Apple Calculator Style
+        finalGpaElement.className = 'gpa-value';
+        if (gpa >= 90) finalGpaElement.classList.add('excellent');
+        else if (gpa >= 80) finalGpaElement.classList.add('vgood');
+        else if (gpa >= 70) finalGpaElement.classList.add('good');
+        else if (gpa >= 60) finalGpaElement.classList.add('avg');
+        else if (gpa >= 50) finalGpaElement.classList.add('acceptable');
+        else finalGpaElement.classList.add('fail');
     } else {
-        gpaScreen.style.display = 'none';
+        // عرض "--" فقط إذا لم يتم إدخال أي درجات
+        finalGpaElement.innerText = "--";
+        finalGpaElement.className = 'gpa-value';
     }
-    
+
     if (sumEcts !== 30 || !isEctsValid) {
         warningDiv.style.display = 'block';
         document.getElementById('current-ects-sum').innerText = sumEcts;
-        finalGpaElement.innerText = "خطأ في الوحدات";
-        finalGpaElement.style.color = "#d32f2f";
     } else {
         warningDiv.style.display = 'none';
-        
-        if (totalWeightedScore > 0) {
-            const gpa = parseFloat((totalWeightedScore / 30).toFixed(2));
-            finalGpaElement.innerText = gpa.toFixed(2);
-            
-            // تطبيق الألوان حسب المعدل
-            if (gpa >= 90) finalGpaElement.style.color = "#1b5e20";
-            else if (gpa >= 80) finalGpaElement.style.color = "#2e7d32";
-            else if (gpa >= 70) finalGpaElement.style.color = "#333";
-            else if (gpa >= 60) finalGpaElement.style.color = "#555";
-            else if (gpa >= 50) finalGpaElement.style.color = "#777";
-            else finalGpaElement.style.color = "#d32f2f";
-        } else {
-            finalGpaElement.innerText = "--";
-            finalGpaElement.style.color = "#2e7d32";
-        }
     }
 }
 
@@ -261,19 +333,21 @@ function generateTextFile() {
         const saei = document.getElementById(`${sub.id}_saei`).value || "-";
         const gradeKey = document.getElementById(`${sub.id}_final_grade`).value;
         const gradeLabel = gradeKey ? GRADES_MAP[gradeKey].label : "--";
-        
-        // حساب الدرجة الدقيقة للامتحان والنهائية للتصدير
-        let examScore = "-";
+
+        // حساب الدرجة النهائية للتصدير باستخدام الصيغة التناسبية
         let totalScoreDisplay = "-";
+        let predictedExamDisplay = "-";
         if (gradeKey && saei !== "-") {
             const saeiNum = parseFloat(saei);
-            const selectedGrade = GRADES_MAP[gradeKey];
-            const saeRatio = saeiNum / 50;
-            examScore = (selectedGrade.min + (saeRatio * 10)).toFixed(1);
-            totalScoreDisplay = (saeiNum + parseFloat(examScore)).toFixed(1);
+            const saeiRatio = saeiNum / 50;
+            const gradeData = GRADES_MAP[gradeKey];
+            const predictedExam = Math.min(50, gradeData.examBase + (saeiRatio * gradeData.examScale));
+            const totalScore = Math.min(100, saeiNum + predictedExam);
+            totalScoreDisplay = totalScore.toFixed(1);
+            predictedExamDisplay = predictedExam.toFixed(1);
         }
-        
-        content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي (من 50): ${saei}\r\nالتقدير النهائي: ${gradeLabel}\r\nدرجة الامتحان المحسوبة: ${examScore}\r\nالدرجة النهائية (السعي+الامتحان): ${totalScoreDisplay}\r\n\r\n`;
+
+        content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي (من 50): ${saei}\r\nالتقدير النهائي: ${gradeLabel}\r\nالدرجة النهائية: ${totalScoreDisplay}\r\nالامتحان المتوقع (من 50): ${predictedExamDisplay}\r\n\r\n`;
     });
 
     content += `--------------------------------------------------\r\nالمعدل الفصلي العام: ${document.getElementById('final-gpa-word').innerText}\r\n`;
