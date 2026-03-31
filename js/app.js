@@ -1,10 +1,10 @@
 // نظام التقديرات والدرجات المقابلة
 const GRADES_MAP = {
-    excellence: { label: 'امتياز (90-100)', value: 95, range: '90-100' },
-    vGood: { label: 'جيد جداً (80-90)', value: 85, range: '80-90' },
-    good: { label: 'جيد (70-80)', value: 75, range: '70-80' },
-    avg: { label: 'متوسط (60-70)', value: 65, range: '60-70' },
-    acceptable: { label: 'مقبول (50-60)', value: 55, range: '50-60' }
+    excellence: { label: 'امتياز', min: 90, max: 100 },
+    vGood: { label: 'جيد جداً', min: 80, max: 90 },
+    good: { label: 'جيد', min: 70, max: 80 },
+    avg: { label: 'متوسط', min: 60, max: 70 },
+    acceptable: { label: 'مقبول', min: 50, max: 60 }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,10 +35,10 @@ function buildTable() {
         tr.innerHTML = `
             <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}" readonly></td>
             <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8" readonly></td>
-            <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="-" min="0" max="50" oninput="validate(this, 50); mainUpdate();"></td>
+            <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="أدخل السعي أولاً" min="0" max="50" required oninput="validate(this, 50); enableGradeSelect('${sub.id}'); mainUpdate();"></td>
             <td>
-                <select id="${sub.id}_final_grade" onchange="mainUpdate()">
-                    <option value="">-- اختر التقدير --</option>
+                <select id="${sub.id}_final_grade" onchange="mainUpdate()" disabled>
+                    <option value="">-- أدخل السعي أولاً --</option>
                     <option value="excellence">امتياز (90-100)</option>
                     <option value="vGood">جيد جداً (80-90)</option>
                     <option value="good">جيد (70-80)</option>
@@ -61,6 +61,22 @@ function validate(el, max) {
     if (val < 0) el.value = 0;
 }
 
+function enableGradeSelect(subjectId) {
+    const saeiInput = document.getElementById(`${subjectId}_saei`);
+    const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+    
+    if (saeiInput.value && parseFloat(saeiInput.value) > 0) {
+        gradeSelect.disabled = false;
+        gradeSelect.options[0].text = "-- اختر التقدير --";
+    } else {
+        gradeSelect.disabled = true;
+        gradeSelect.value = "";
+        gradeSelect.options[0].text = "-- أدخل السعي أولاً --";
+        document.getElementById(`${subjectId}_grade_text`).innerText = "--";
+        document.getElementById(`${subjectId}_grade_cell`).className = "";
+    }
+}
+
 function setupEventListeners() {
     document.getElementById('btn-toggle-save').addEventListener('click', toggleSaveWindow);
     document.getElementById('btn-gpa-info').addEventListener('click', () => 
@@ -69,13 +85,11 @@ function setupEventListeners() {
         document.getElementById('gpa-modal').classList.remove('show'));
     document.getElementById('btn-export').addEventListener('click', generateTextFile);
 
-    document.getElementById('predict-mode').addEventListener('change', mainUpdate);
     document.getElementById('edit-ects-mode').addEventListener('change', toggleEctsEdit);
     document.getElementById('edit-names-mode').addEventListener('change', toggleNamesEdit);
 }
 
 function mainUpdate() {
-    const isPredict = document.getElementById('predict-mode').checked;
     let totalWeightedScore = 0;
     let sumEcts = 0;
     let isEctsValid = true;
@@ -99,6 +113,14 @@ function mainUpdate() {
 
         // معالجة التقديرات
         const saei = parseFloat(saeiInput.value) || 0;
+        
+        // إذا لم يتم إدخال السعي، لا تعرض شيئاً
+        if (!saeiInput.value || saei === 0) {
+            textGrade.innerText = "--";
+            gradeCell.className = "";
+            return;
+        }
+        
         gradeCell.className = "";
         
         if (gradeSelect.value === "") {
@@ -107,11 +129,18 @@ function mainUpdate() {
         }
 
         const selectedGrade = GRADES_MAP[gradeSelect.value];
-        const finalScore = selectedGrade.value;
-        const totalScore = saei + finalScore;
+        
+        // حساب الدرجة الدقيقة في الامتحان النهائي بناءً على السعي
+        // كلما كان السعي أعلى، كانت درجة الامتحان أقرب للحد الأقصى للتقدير
+        // المعادلة: درجة الامتحان = الحد الأدنى + (نسبة السعي من 50 * مدى الـ 10 درجات)
+        const saeRatio = saei / 50; // نسبة السعي من 50
+        const examScore = selectedGrade.min + (saeRatio * 10);
+        
+        // الدرجة النهائية = السعي + درجة الامتحان المحسوبة
+        const totalScore = saei + examScore;
 
-        // عرض متوسط التقدير
-        textGrade.innerText = `${finalScore}`;
+        // عرض التقدير فقط (ليس الدرجة)
+        textGrade.innerText = selectedGrade.label;
         applyColorToCell(gradeCell, totalScore);
         totalWeightedScore += (totalScore * ectsVal);
     });
@@ -191,10 +220,19 @@ function generateTextFile() {
         const saei = document.getElementById(`${sub.id}_saei`).value || "-";
         const gradeKey = document.getElementById(`${sub.id}_final_grade`).value;
         const gradeLabel = gradeKey ? GRADES_MAP[gradeKey].label : "--";
-        const gradeValue = gradeKey ? GRADES_MAP[gradeKey].value : "-";
-        const avgScore = document.getElementById(`${sub.id}_grade_text`).innerText;
         
-        content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي (من 50): ${saei}\r\nالتقدير النهائي: ${gradeLabel}\r\nمتوسط التقدير: ${avgScore}\r\n\r\n`;
+        // حساب الدرجة الدقيقة للامتحان والنهائية للتصدير
+        let examScore = "-";
+        let totalScoreDisplay = "-";
+        if (gradeKey && saei !== "-") {
+            const saeiNum = parseFloat(saei);
+            const selectedGrade = GRADES_MAP[gradeKey];
+            const saeRatio = saeiNum / 50;
+            examScore = (selectedGrade.min + (saeRatio * 10)).toFixed(1);
+            totalScoreDisplay = (saeiNum + parseFloat(examScore)).toFixed(1);
+        }
+        
+        content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي (من 50): ${saei}\r\nالتقدير النهائي: ${gradeLabel}\r\nدرجة الامتحان المحسوبة: ${examScore}\r\nالدرجة النهائية (السعي+الامتحان): ${totalScoreDisplay}\r\n\r\n`;
     });
 
     content += `--------------------------------------------------\r\nالمعدل الفصلي العام: ${document.getElementById('final-gpa-word').innerText}\r\n`;
