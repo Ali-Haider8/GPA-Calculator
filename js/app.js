@@ -17,13 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
 function populateDropdowns() {
     const fill = (id, data) => {
         const el = document.getElementById(id);
+        if (!el) return;
         el.innerHTML = "";
         data.forEach(item => el.add(new Option(item, item)));
     };
-    fill('dept-name', APP_CONFIG.departments);
-    fill('academic-year', APP_CONFIG.academicYears);
     fill('stage-name', APP_CONFIG.stages);
     fill('semester-name', APP_CONFIG.semesters);
+}
+
+function validateYear(input, min, max) {
+    let val = parseInt(input.value);
+    if (isNaN(val)) return;
+    if (val < min) input.value = min;
+    if (val > max) input.value = max;
+}
+
+function updateAcademicYear() {
+    const startInput = document.getElementById('academic-year-start');
+    const endInput = document.getElementById('academic-year-end');
+    const startVal = startInput.value;
+    const endVal = endInput.value;
+    
+    if (startVal && endVal) {
+        // يمكن استخدام هذه الدالة لتحديث قيمة مخفية أو للتحقق
+        console.log(`السنة الدراسية: ${startVal}-${endVal}`);
+    }
 }
 
 function buildTable() {
@@ -46,8 +64,8 @@ function buildTable() {
                     <option value="acceptable">مقبول (50-60)</option>
                 </select>
             </td>
-            <td id="${sub.id}_grade_cell">
-                <span id="${sub.id}_grade_text">--</span>
+            <td id="${sub.id}_gpa_cell">
+                <span id="${sub.id}_gpa_text">--</span>
             </td>
         `;
         tbody.appendChild(tr);
@@ -72,8 +90,8 @@ function enableGradeSelect(subjectId) {
         gradeSelect.disabled = true;
         gradeSelect.value = "";
         gradeSelect.options[0].text = "-- أدخل السعي أولاً --";
-        document.getElementById(`${subjectId}_grade_text`).innerText = "--";
-        document.getElementById(`${subjectId}_grade_cell`).className = "";
+        document.getElementById(`${subjectId}_gpa_text`).innerText = "--";
+        document.getElementById(`${subjectId}_gpa_cell`).className = "";
     }
 }
 
@@ -98,8 +116,8 @@ function mainUpdate() {
         const ectsInput = document.getElementById(`${sub.id}_ects`);
         const saeiInput = document.getElementById(`${sub.id}_saei`);
         const gradeSelect = document.getElementById(`${sub.id}_final_grade`);
-        const textGrade = document.getElementById(`${sub.id}_grade_text`);
-        const gradeCell = document.getElementById(`${sub.id}_grade_cell`);
+        const textGrade = document.getElementById(`${sub.id}_gpa_text`);
+        const gpaCell = document.getElementById(`${sub.id}_gpa_cell`);
         
         // التحقق من الوحدات
         let ectsVal = parseInt(ectsInput.value) || 0;
@@ -117,11 +135,11 @@ function mainUpdate() {
         // إذا لم يتم إدخال السعي، لا تعرض شيئاً
         if (!saeiInput.value || saei === 0) {
             textGrade.innerText = "--";
-            gradeCell.className = "";
+            gpaCell.className = "";
             return;
         }
         
-        gradeCell.className = "";
+        gpaCell.className = "";
         
         if (gradeSelect.value === "") {
             textGrade.innerText = "--";
@@ -139,15 +157,33 @@ function mainUpdate() {
         // الدرجة النهائية = السعي + درجة الامتحان المحسوبة
         const totalScore = saei + examScore;
 
-        // عرض التقدير فقط (ليس الدرجة)
-        textGrade.innerText = selectedGrade.label;
-        applyColorToCell(gradeCell, totalScore);
+        // عرض المعدل الرقمي للمادة (GPA للمادة)
+        textGrade.innerText = totalScore.toFixed(2);
+        applyColorToCell(gpaCell, totalScore);
         totalWeightedScore += (totalScore * ectsVal);
     });
 
     // التنبيهات واحتساب الـ GPA
     const warningDiv = document.getElementById('ects-warning');
     const finalGpaElement = document.getElementById('final-gpa-word');
+    const gpaScreen = document.getElementById('screen-container');
+    
+    // التحقق مما إذا كانت جميع المواد قد أدخلت درجاتها
+    let allSubjectsCompleted = true;
+    APP_CONFIG.defaultSubjects.forEach(sub => {
+        const saeiInput = document.getElementById(`${sub.id}_saei`);
+        const gradeSelect = document.getElementById(`${sub.id}_final_grade`);
+        if (!saeiInput.value || !gradeSelect.value) {
+            allSubjectsCompleted = false;
+        }
+    });
+    
+    // إظهار شاشة GPA فقط بعد إدخال جميع الدرجات
+    if (allSubjectsCompleted && sumEcts === 30 && isEctsValid) {
+        gpaScreen.style.display = 'block';
+    } else {
+        gpaScreen.style.display = 'none';
+    }
     
     if (sumEcts !== 30 || !isEctsValid) {
         warningDiv.style.display = 'block';
@@ -210,8 +246,13 @@ function toggleSaveWindow() {
 function generateTextFile() {
     const getVal = id => document.getElementById(id).value.trim() || "-";
     const studentName = getVal('student-name');
+    
+    // الحصول على السنة الدراسية من الحقلين الجديدين
+    const yearStart = document.getElementById('academic-year-start').value || "----";
+    const yearEnd = document.getElementById('academic-year-end').value || "----";
+    const academicYearDisplay = `${yearStart}-${yearEnd}`;
 
-    let content = `اسم الطالب: ${studentName}\r\nالجامعة: ${getVal('uni-name')}\r\nالكلية: ${getVal('college-name')}\r\nالقسم: ${getVal('dept-name')}\r\nالسنة الدراسية: ${getVal('academic-year')} | المرحلة: ${getVal('stage-name')} | الفصل: ${getVal('semester-name')}\r\n`;
+    let content = `اسم الطالب: ${studentName}\r\nالجامعة: ${getVal('uni-name')}\r\nالكلية: ${getVal('college-name')}\r\nالقسم: ${getVal('dept-name')}\r\nالسنة الدراسية: ${academicYearDisplay} | المرحلة: ${getVal('stage-name')} | الفصل: ${getVal('semester-name')}\r\n`;
     content += `--------------------------------------------------\r\n\r\n`;
 
     APP_CONFIG.defaultSubjects.forEach(sub => {
