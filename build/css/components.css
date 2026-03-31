@@ -1,0 +1,225 @@
+/* === COMPONENT STYLES === */
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-bg-white);
+    min-width: 700px;
+}
+
+th, td {
+    border: 1px solid var(--color-border-table);
+    padding: var(--spacing-md) var(--spacing-sm);
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+th {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    font-weight: 700;
+    border: 1px solid var(--color-primary-darker);
+    letter-spacing: 0.3px;
+}
+
+th:nth-child(5), td:nth-child(5) {
+    background-color: var(--color-bg-light);
+}
+
+th:nth-child(5) {
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Input Fields */
+input[type="number"], input[type="text"] {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    text-align: center;
+    font-size: 1rem;
+    outline: none;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+input[type="number"]:focus, input[type="text"]:focus {
+    background-color: var(--color-bg-input-focus);
+    border-color: var(--color-primary-darker);
+    box-shadow: var(--shadow-input-focus);
+}
+
+.ects-input, .name-input {
+    border: 1px solid var(--color-border-default) !important;
+    background-color: var(--color-bg-white) !important;
+    font-weight: 600;
+    color: var(--color-text-light);
+    text-align: center;
+    font-family: inherit;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--spacing-sm) var(--spacing-xs);
+}
+
+.ects-input { width: 55px; }
+.name-input { min-width: 140px; }
+
+.ects-input.error {
+    border: 2px solid var(--color-border-error) !important;
+    color: var(--color-border-error) !important;
+}
+
+/* Select Dropdowns */
+select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.95rem;
+    font-family: inherit;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background-color: var(--color-bg-white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 160px;
+}
+
+select:hover:not(:disabled) {
+    border-color: var(--color-primary-darker);
+    background-color: var(--color-bg-light);
+}
+
+select:focus {
+    border-color: var(--color-primary-darker);
+    box-shadow: var(--shadow-input-focus);
+}
+
+select:disabled {
+    background-color: #eee;
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
+}
+
+.exam-select {
+    min-width: 70px;
+    font-weight: bold;
+    color: #1976d2;
+    background-color: var(--color-bg-exam-select);
+}
+
+/* Buttons */
+.toggle-tab-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--color-btn-tab-start) 0%, var(--color-btn-tab-end) 100%);
+    color: var(--color-text-primary);
+    border: none;
+    padding: var(--spacing-xl);
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: inherit;
+    text-align: right;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-tab-btn:hover {
+    background: linear-gradient(135deg, var(--color-btn-tab-hover-start) 0%, var(--color-btn-tab-hover-end) 100%);
+}
+
+.btn-success {
+    width: 100%;
+    background: linear-gradient(135deg, var(--color-btn-success-start) 0%, var(--color-btn-success-end) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    font-family: inherit;
+    box-shadow: var(--shadow-btn-success);
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-btn-success-hover);
+}
+
+/* Floating Info Button */
+.info-btn-container {
+    position: fixed;
+    left: 30px;
+    bottom: 30px;
+    background: linear-gradient(135deg, var(--color-btn-info-start) 0%, var(--color-btn-info-end) 100%);
+    color: white;
+    width: 90px;
+    height: 90px;
+    border-radius: var(--radius-round);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-btn-info);
+    transition: all 0.3s ease;
+    z-index: 100;
+    border: none;
+}
+
+.info-btn-container:hover {
+    transform: scale(1.12);
+}
+
+.info-icon {
+    font-size: 2.8rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.info-text {
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-top: var(--spacing-md);
+    text-align: center;
+}
+
+/* Modal Close Button */
+.close-modal {
+    position: absolute;
+    top: var(--spacing-lg);
+    left: var(--spacing-xl);
+    font-size: 2rem;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+.close-modal:hover {
+    color: var(--color-error-bg);
+}
+
+.modal-content h2 {
+    color: #1976d2;
+    margin-top: 0;
+    border-bottom: 2px solid var(--color-border-modal);
+    padding-bottom: var(--spacing-lg);
+    font-size: 1.6rem;
+}
+
+.modal-content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-secondary);
+}

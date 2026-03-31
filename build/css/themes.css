@@ -1,0 +1,45 @@
+/* === THEMES & GRADE COLORS === */
+
+/* Grade Color Classes */
+.grade-excellent { 
+    background-color: var(--color-grade-excellent-bg); 
+    color: var(--color-grade-excellent-text); 
+    font-weight: bold; 
+}
+
+.grade-vgood { 
+    background-color: var(--color-grade-vgood-bg); 
+    color: var(--color-grade-vgood-text); 
+    font-weight: bold; 
+}
+
+.grade-good { 
+    background-color: var(--color-grade-good-bg); 
+    color: var(--color-grade-good-text); 
+    font-weight: 600; 
+}
+
+.grade-avg { 
+    background-color: var(--color-grade-avg-bg); 
+    color: var(--color-grade-avg-text); 
+    font-weight: 600; 
+}
+
+.grade-acceptable { 
+    background-color: var(--color-grade-acceptable-bg); 
+    color: var(--color-grade-acceptable-text); 
+    font-weight: 600; 
+}
+
+.grade-fail { 
+    background-color: var(--color-grade-fail-bg); 
+    color: var(--color-grade-fail-text); 
+    font-weight: bold; 
+}
+
+/* Modal Content Styles */
+.modal-content hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: var(--spacing-lg) 0;
+}
