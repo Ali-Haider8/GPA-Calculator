@@ -1,0 +1,111 @@
+/* === BASE STYLES === */
+
+/* CSS Custom Properties (Variables) */
+:root {
+    /* Primary Colors */
+    --color-primary: #4CAF50;
+    --color-primary-dark: #388E3C;
+    --color-primary-darker: #2e7d32;
+    
+    /* Background Colors */
+    --color-bg-body-start: #37474f;
+    --color-bg-body-end: #455a64;
+    --color-bg-app: #f0f0f0;
+    --color-bg-white: #ffffff;
+    --color-bg-light: #f5f5f5;
+    --color-bg-input-focus: #e8f5e9;
+    --color-bg-exam-select: #f0f8ff;
+    --color-bg-modal: #fff;
+    --color-bg-math-box: #f9f9f9;
+    --color-bg-gpa-screen-start: #f4fdf4;
+    --color-bg-gpa-screen-end: #e8f5e9;
+    
+    /* Text Colors */
+    --color-text-primary: #37474f;
+    --color-text-secondary: #555;
+    --color-text-light: #333;
+    --color-text-disabled: #aaa;
+    
+    /* Border Colors */
+    --color-border-default: #ccc;
+    --color-border-table: #ddd;
+    --color-border-app: #a0a0a0;
+    --color-border-white: #ffffff;
+    --color-border-accent: #c8e6c9;
+    --color-border-error: red;
+    --color-border-modal: #e0e0e0;
+    
+    /* Grade Colors */
+    --color-grade-excellent-bg: #c8e6c9;
+    --color-grade-excellent-text: #1b5e20;
+    --color-grade-vgood-bg: #a5d6a7;
+    --color-grade-vgood-text: #1b5e20;
+    --color-grade-good-bg: #e8f5e9;
+    --color-grade-good-text: #2e7d32;
+    --color-grade-avg-bg: #fff9c4;
+    --color-grade-avg-text: #f57f17;
+    --color-grade-acceptable-bg: #ffe0b2;
+    --color-grade-acceptable-text: #e65100;
+    --color-grade-fail-bg: #ffcdd2;
+    --color-grade-fail-text: #b71c1c;
+    
+    /* Error/Warning Colors */
+    --color-error-bg: #d32f2f;
+    --color-error-text: white;
+    --color-error-border: #d32f2f;
+    
+    /* Button Colors */
+    --color-btn-tab-start: #cfd8dc;
+    --color-btn-tab-end: #b0bec5;
+    --color-btn-tab-hover-start: #b0bec5;
+    --color-btn-tab-hover-end: #90a4ae;
+    --color-btn-success-start: #2e7d32;
+    --color-btn-success-end: #1b5e20;
+    --color-btn-info-start: #f57c00;
+    --color-btn-info-end: #e65100;
+    
+    /* Shadows */
+    --shadow-app: 5px 5px 20px rgba(0, 0, 0, 0.5);
+    --shadow-table: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-warning: 0 2px 8px rgba(211, 47, 47, 0.3);
+    --shadow-btn-success: 0 3px 8px rgba(0, 0, 0, 0.2);
+    --shadow-btn-success-hover: 0 5px 12px rgba(0, 0, 0, 0.3);
+    --shadow-btn-info: 0 4px 15px rgba(0, 0, 0, 0.4);
+    --shadow-modal: 0 5px 25px rgba(0, 0, 0, 0.5);
+    --shadow-input-focus: 0 0 4px rgba(46, 125, 50, 0.3);
+    
+    /* Typography */
+    --font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    --font-family-mono: 'Courier New', monospace;
+    
+    /* Spacing */
+    --spacing-xs: 5px;
+    --spacing-sm: 8px;
+    --spacing-md: 10px;
+    --spacing-lg: 15px;
+    --spacing-xl: 20px;
+    --spacing-xxl: 25px;
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-round: 15px;
+}
+
+/* Reset & Base */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--color-bg-body-start) 0%, var(--color-bg-body-end) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: var(--spacing-lg);
+}
