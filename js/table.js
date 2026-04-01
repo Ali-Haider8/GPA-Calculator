@@ -10,10 +10,10 @@ function buildTable() {
     APP_CONFIG.defaultSubjects.forEach((sub) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}"></td>
-            <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8"></td>
-            <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="من 50" min="0" max="50"></td>
-            <td>
+            <td data-label="المادة"><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}"></td>
+            <td data-label="الوحدات"><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8"></td>
+            <td data-label="السعي (50)"><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="من 50" min="0" max="50"></td>
+            <td data-label="التقدير المحرز">
                 <select id="${sub.id}_final_grade" disabled>
                     <option value="">-- أدخل السعي أولاً --</option>
                     <option value="excellence">امتياز (90-100)</option>
@@ -25,12 +25,12 @@ function buildTable() {
                     <option value="fail_f">راسب (0-44)</option>
                 </select>
             </td>
-            <td id="${sub.id}_predicted_exam_cell">
+            <td data-label="درجة الفاينل" id="${sub.id}_predicted_exam_cell">
                 <select id="${sub.id}_predicted_exam" class="exam-select" disabled>
                     <option value="">-</option>
                 </select>
             </td>
-            <td id="${sub.id}_gpa_cell">
+            <td data-label="GPA المادة" id="${sub.id}_gpa_cell">
                 <span id="${sub.id}_gpa_text" style="font-weight:bold;">--</span>
             </td>
         `;

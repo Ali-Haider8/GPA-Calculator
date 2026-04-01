@@ -3,13 +3,17 @@
 /* Table Styles */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     background-color: var(--color-bg-white);
     min-width: 700px;
+    border: 1px solid var(--color-border-table);
+    border-radius: var(--radius-md);
+    overflow: hidden;
 }
 
 th, td {
-    border: 1px solid var(--color-border-table);
+    border-bottom: 1px solid var(--color-border-table);
     padding: var(--spacing-md) var(--spacing-sm);
     text-align: center;
     font-size: 0.95rem;
@@ -19,7 +23,7 @@ th {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     color: white;
     font-weight: 700;
-    border: 1px solid var(--color-primary-darker);
+    border-bottom: 1px solid var(--color-primary-darker);
     letter-spacing: 0.3px;
 }
 
@@ -28,11 +32,31 @@ th:nth-child(5), td:nth-child(5) {
 }
 
 th:nth-child(5) {
-    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    background: var(--color-primary-dark);
 }
 
-tr:hover {
-    background-color: #f9f9f9;
+
+/* GPA Summary Footer Row */
+tfoot tr {
+    background: var(--color-primary-soft);
+    border-top: 2px solid var(--color-border-accent);
+}
+
+.gpa-footer-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: var(--spacing-md) var(--spacing-sm);
+}
+
+.gpa-footer-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-primary-darker);
+    font-family: var(--font-family-mono);
+    text-align: center;
+    padding: var(--spacing-md) var(--spacing-sm);
 }
 
 /* Input Fields */
@@ -45,11 +69,12 @@ input[type="number"], input[type="text"] {
     border-radius: var(--radius-sm);
     transition: all 0.2s ease;
     font-family: inherit;
+    background-color: var(--color-bg-white);
 }
 
 input[type="number"]:focus, input[type="text"]:focus {
     background-color: var(--color-bg-input-focus);
-    border-color: var(--color-primary-darker);
+    border-color: var(--color-primary);
     box-shadow: var(--shadow-input-focus);
 }
 
@@ -89,17 +114,17 @@ select {
 }
 
 select:hover:not(:disabled) {
-    border-color: var(--color-primary-darker);
+    border-color: var(--color-primary);
     background-color: var(--color-bg-light);
 }
 
 select:focus {
-    border-color: var(--color-primary-darker);
+    border-color: var(--color-primary);
     box-shadow: var(--shadow-input-focus);
 }
 
 select:disabled {
-    background-color: #eee;
+    background-color: var(--color-bg-light);
     color: var(--color-text-disabled);
     cursor: not-allowed;
 }
@@ -107,62 +132,57 @@ select:disabled {
 .exam-select {
     min-width: 70px;
     font-weight: bold;
-    color: #1976d2;
+    color: var(--color-primary-darker);
     background-color: var(--color-bg-exam-select);
 }
 
-/* Buttons */
-.toggle-tab-btn {
-    width: 100%;
-    background: linear-gradient(135deg, var(--color-btn-tab-start) 0%, var(--color-btn-tab-end) 100%);
-    color: var(--color-text-primary);
-    border: none;
-    padding: var(--spacing-xl);
-    font-size: 1.1rem;
-    font-weight: bold;
-    font-family: inherit;
-    text-align: right;
-    cursor: pointer;
-    transition: background 0.3s ease;
+/* Save Button */
+.save-bar {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
 }
 
-.toggle-tab-btn:hover {
-    background: linear-gradient(135deg, var(--color-btn-tab-hover-start) 0%, var(--color-btn-tab-hover-end) 100%);
-}
-
-.btn-success {
-    width: 100%;
-    background: linear-gradient(135deg, var(--color-btn-success-start) 0%, var(--color-btn-success-end) 100%);
+.btn-quick-save {
+    background: var(--color-primary);
     color: white;
     border: none;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-xl);
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.1rem;
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
     font-family: inherit;
-    box-shadow: var(--shadow-btn-success);
-    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: none;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
 }
 
-.btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-btn-success-hover);
+.btn-quick-save:hover:not(:disabled) {
+    background: var(--color-primary-dark);
 }
+
+.btn-quick-save:disabled {
+    background: var(--color-bg-white);
+    color: var(--color-text-disabled);
+    border: 1px solid var(--color-border-default);
+    cursor: not-allowed;
+}
+
 
 /* Floating Info Button */
 .info-btn-container {
     position: fixed;
-    left: 30px;
-    bottom: 30px;
+    left: 20px;
+    bottom: 20px;
     background: linear-gradient(135deg, var(--color-btn-info-start) 0%, var(--color-btn-info-end) 100%);
     color: white;
-    width: 90px;
-    height: 90px;
-    border-radius: var(--radius-round);
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -171,24 +191,21 @@ select:disabled {
     box-shadow: var(--shadow-btn-info);
     transition: all 0.3s ease;
     z-index: 100;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .info-btn-container:hover {
-    transform: scale(1.12);
+    transform: scale(1.1);
 }
 
 .info-icon {
-    font-size: 2.8rem;
+    font-size: 1.4rem;
     font-weight: bold;
     line-height: 1;
 }
 
 .info-text {
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-top: var(--spacing-md);
-    text-align: center;
+    display: none;
 }
 
 /* Modal Close Button */
@@ -198,7 +215,7 @@ select:disabled {
     left: var(--spacing-xl);
     font-size: 2rem;
     font-weight: bold;
-    color: #999;
+    color: #7a8fa3;
     cursor: pointer;
     border: none;
     background: none;
@@ -210,7 +227,7 @@ select:disabled {
 }
 
 .modal-content h2 {
-    color: #1976d2;
+    color: var(--color-primary-dark);
     margin-top: 0;
     border-bottom: 2px solid var(--color-border-modal);
     padding-bottom: var(--spacing-lg);

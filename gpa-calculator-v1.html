@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+
+    <style>
+        /* --- الإعدادات العامة --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #37474f 0%, #455a64 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100svh;
+            margin: 0;
+            padding: 18px;
+        }
+
+        /* الحاوية الرئيسية */
+        .app-container {
+            background-color: #f0f0f0;
+            border: 2px solid #a0a0a0;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 860px;
+            position: relative; /* لإحتواء الزر العائم داخله */
+        }
+
+        /* --- الشاشة العلوية للمعدل --- */
+        .gpa-screen {
+            position: relative;
+            background: linear-gradient(135deg, #f4fdf4 0%, #e8f5e9 100%);
+            border: 3px solid #a0a0a0;
+            border-bottom-color: #ffffff;
+            border-right-color: #ffffff;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center; 
+            text-align: center;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .screen-title {
+            font-size: 1.4rem;
+            color: #37474f;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #c8e6c9;
+            padding-bottom: 5px;
+            width: 80%;
+        }
+
+        .gpa-label {
+            font-size: 1.05rem;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .gpa-value {
+            font-size: 3.2rem;
+            font-weight: bold;
+            color: #2e7d32;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: 'Courier New', monospace;
+            line-height: 1;
+        }
+
+        /* رسالة الخطأ للوحدات */
+        .warning-box {
+            background-color: #d32f2f;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- الجدول المتجاوب --- */
+        .table-responsive {
+            width: 100%;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            min-width: 0;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 9px 7px;
+            text-align: center;
+            font-size: 0.88rem;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        th {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            font-weight: 700;
+            border: 1px solid #2e7d32;
+            letter-spacing: 0.3px;
+        }
+
+        th:nth-child(5), td:nth-child(5) {
+            background-color: #f5f5f5;
+        }
+
+        th:nth-child(5) {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* --- حقول الإدخال --- */
+        input[type="number"], input[type="text"] {
+            padding: 6px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 0.92rem;
+            outline: none;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            background-color: #e8f5e9;
+            border-color: #2e7d32;
+            box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+        }
+
+        .ects-input, .name-input {
+            border: 1px solid #ccc !important;
+            background-color: #fff !important;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            font-family: inherit;
+            font-size: 0.92rem;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px 4px;
+        }
+        
+        .ects-input { width: 100%; }
+        .name-input { min-width: 0; }
+
+        .ects-input.error {
+            border: 2px solid red !important;
+            color: red !important;
+        }
+
+        select {
+            padding: 6px 8px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            background-color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 0;
+            width: 100%;
+        }
+
+        select:hover:not(:disabled) {
+            border-color: #2e7d32;
+            background-color: #f5f5f5;
+        }
+
+        select:focus {
+            border-color: #2e7d32;
+            box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+        }
+
+        select:disabled {
+            background-color: #eee;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        .exam-select {
+            min-width: 0;
+            font-weight: bold;
+            color: #1976d2;
+            background-color: #f0f8ff;
+        }
+
+        /* --- ألوان التقديرات --- */
+        .grade-excellent { background-color: #c8e6c9; color: #1b5e20; font-weight: bold; }
+        .grade-vgood { background-color: #a5d6a7; color: #1b5e20; font-weight: bold; }
+        .grade-good { background-color: #e8f5e9; color: #2e7d32; font-weight: 600; }
+        .grade-avg { background-color: #fff9c4; color: #f57f17; font-weight: 600; }
+        .grade-acceptable { background-color: #ffe0b2; color: #e65100; font-weight: 600; }
+        .grade-fail { background-color: #ffcdd2; color: #b71c1c; font-weight: bold; }
+
+        /* --- أزرار التحكم (في حاوية التطبيق) --- */
+        .bottom-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .export-btn-inline {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .export-btn-inline:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1b5e20 0%, #0d3b10 100%);
+        }
+
+        .export-btn-inline:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #666666;
+        }
+
+        /* --- النافذة المنبثقة (Modal) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            color: #333;
+            direction: rtl;
+        }
+
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .close-modal:hover { color: #d32f2f; }
+        .modal-content h2 { color: #1976d2; margin-top: 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; font-size: 1.6rem; }
+        .modal-content p { font-size: 1rem; line-height: 1.6; margin-bottom: 18px; color: #555; }
+        .math-box { background: #f9f9f9; padding: 18px; border-radius: 8px; border: 2px solid #e0e0e0; margin: 18px 0; text-align: center; font-size: 0.95rem; }
+
+        /* --- التجاوب مع شاشات الموبايل --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .app-container {
+                padding: 8px;
+                border-radius: 6px;
+            }
+
+            .gpa-screen {
+                min-height: 84px;
+                margin-bottom: 10px;
+                padding: 10px;
+            }
+
+            .gpa-label {
+                font-size: 0.92rem;
+            }
+
+            .gpa-value {
+                font-size: 2.35rem;
+            }
+
+            .warning-box {
+                padding: 8px;
+                font-size: 0.82rem;
+                margin-bottom: 8px;
+            }
+
+            .table-responsive {
+                margin-bottom: 10px;
+            }
+
+            table { min-width: 0; }
+
+            th, td {
+                padding: 6px 4px;
+                font-size: 0.76rem;
+            }
+
+            input[type="number"], input[type="text"] {
+                font-size: 0.8rem;
+                padding: 5px 3px;
+            }
+
+            .name-input { font-size: 0.8rem; }
+
+            .ects-input {
+                width: 100%;
+                font-size: 0.8rem;
+            }
+
+            select {
+                min-width: 0;
+                font-size: 0.76rem;
+                padding: 5px 4px;
+            }
+
+            .exam-select { min-width: 0; }
+
+            .bottom-actions {
+                margin-top: 8px;
+            }
+
+            .bottom-actions > div {
+                display: none;
+            }
+
+            .export-btn-inline {
+                width: 100%;
+                justify-content: center;
+                padding: 9px 10px;
+                font-size: 0.86rem;
+            }
+
+            .modal-content {
+                padding: 18px 14px;
+                max-height: 88vh;
+            }
+
+            .modal-content h2 {
+                font-size: 1.2rem;
+                padding-bottom: 10px;
+            }
+
+            .modal-content p {
+                font-size: 0.9rem;
+                margin-bottom: 12px;
+            }
+
+            .math-box {
+                padding: 12px;
+                margin: 12px 0;
+                font-size: 0.85rem;
+            }
+
+            .close-modal {
+                top: 8px;
+                left: 12px;
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .app-container {
+                max-width: 820px;
+                padding: 14px;
+            }
+        }
+
+        /* --- زر الزاوية العلوي --- */
+        .top-corner-btn-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+        .top-corner-btn-container button {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            color: #ffffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(46, 125, 50, 0.35);
+            transition: all 0.2s ease;
+            border: 1px solid #e8f5e9;
+            padding: 0;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+        .top-corner-btn-container button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 18px rgba(46, 125, 50, 0.42);
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        }
+        @media (max-width: 768px) {
+            .top-corner-btn-container {
+                top: 8px;
+                left: 8px;
+            }
+            .top-corner-btn-container button {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            table { min-width: 0; }
+
+            th, td {
+                font-size: 0.72rem;
+            }
+
+            .gpa-value {
+                font-size: 2.1rem;
+            }
+
+            .name-input { min-width: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="gpa-screen" id="screen-container">
+            <div class="top-corner-btn-container">
+                <button id="btn-gpa-info-corner" title="معلومات حول الـ GPA">?</button>
+            </div>
+            <div class="gpa-label">المعدل الفصلي (GPA) المتوقع</div>
+            <div class="gpa-value" id="final-gpa-word">--</div>
+        </div>
+
+        <div class="warning-box" id="ects-warning">
+            المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30 وحدة بالضبط!
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>المادة</th>
+                        <th>الوحدات</th>
+                        <th>السعي (50)</th>
+                        <th id="final-header">التقدير المحرز</th>
+                        <th>درجة الفاينل المتوقعة</th>
+                        <th>GPA المادة</th>
+                    </tr>
+                </thead>
+                <tbody id="subjects-body"></tbody>
+            </table>
+        </div>
+
+        <div class="bottom-actions">
+            <div></div> <!-- Spacer -->
+            <button class="export-btn-inline" id="btn-export-data" title="تصدير النتائج كملف نصي" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                تصدير النتائج
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="gpa-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="btn-close-modal">&times;</button>
+            <h2>ما هو معدل الـ GPA؟ وما أهميته؟</h2>
+            <p>معدل الـ <strong>GPA</strong> (Grade Point Average) هو المقياس العالمي لتقييم أداء الطالب الأكاديمي في <strong>مسار بولونيا</strong>.</p>
+            <hr>
+            <div class="math-box">
+                <strong style="color: #2e7d32;">المعادلة الرسمية:</strong><br><br>
+                $$GPA = \frac{\sum (ECTS \times Grade)}{Total \ ECTS}$$
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIG ===
+        const APP_CONFIG = {
+            defaultSubjects: [
+                { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
+                { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
+                { id: 'math', name: 'الرياضيات', ects: 6 },
+                { id: 'arabic', name: 'لغة عربية', ects: 3 },
+                { id: 'english', name: 'أساسيات اللغة الإنجليزية', ects: 4 },
+                { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
+            ]
+        };
+
+        // === GRADES MAP (Updated Limits) ===
+        const GRADES_MAP = {
+            excellence: { label: 'امتياز (90-100)', minTarget: 90, maxTarget: 100 },
+            vGood: { label: 'جيد جداً (80-89)', minTarget: 80, maxTarget: 89 },
+            good: { label: 'جيد (70-79)', minTarget: 70, maxTarget: 79 },
+            avg: { label: 'متوسط (60-69)', minTarget: 60, maxTarget: 69 },
+            acceptable: { label: 'مقبول (50-59)', minTarget: 50, maxTarget: 59 },
+            fail_fx: { label: 'راسب قيد المعالجة (45-49)', minTarget: 45, maxTarget: 49 },
+            fail_f: { label: 'راسب (0-44)', minTarget: 0, maxTarget: 44 }
+        };
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            buildTable();
+            setupEventListeners();
+            mainUpdate();
+        });
+
+        function buildTable() {
+            const tbody = document.getElementById('subjects-body');
+            tbody.innerHTML = "";
+
+            APP_CONFIG.defaultSubjects.forEach((sub) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}" oninput="mainUpdate()"></td>
+                    <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8" oninput="mainUpdate()"></td>
+                    <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="من 50" min="0" max="50" oninput="handleSaeiChange(this, '${sub.id}')"></td>
+                    <td>
+                        <select id="${sub.id}_final_grade" onchange="handleGradeChange('${sub.id}')" disabled>
+                            <option value="">-- أدخل السعي أولاً --</option>
+                            <option value="excellence">امتياز (90-100)</option>
+                            <option value="vGood">جيد جداً (80-89)</option>
+                            <option value="good">جيد (70-79)</option>
+                            <option value="avg">متوسط (60-69)</option>
+                            <option value="acceptable">مقبول (50-59)</option>
+                            <option value="fail_fx">راسب قيد المعالجة (45-49)</option>
+                            <option value="fail_f">راسب (0-44)</option>
+                        </select>
+                    </td>
+                    <td id="${sub.id}_predicted_exam_cell">
+                        <select id="${sub.id}_predicted_exam" class="exam-select" onchange="mainUpdate()" disabled>
+                            <option value="">-</option>
+                        </select>
+                    </td>
+                    <td id="${sub.id}_gpa_cell">
+                        <span id="${sub.id}_gpa_text" style="font-weight:bold;">--</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function validate(el, max) {
+            if (el.value === "") return;
+            let val = parseInt(el.value);
+            if (val > max) el.value = max;
+            if (val < 0) el.value = 0;
+        }
+
+        function handleSaeiChange(el, subjectId) {
+            validate(el, 50);
+            enableGradeSelect(subjectId);
+            updateExamDropdown(subjectId);
+            mainUpdate();
+        }
+
+        function handleGradeChange(subjectId) {
+            updateExamDropdown(subjectId);
+            mainUpdate();
+        }
+
+        function enableGradeSelect(subjectId) {
+            const saeiInput = document.getElementById(`${subjectId}_saei`);
+            const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+
+            if (saeiInput.value && parseFloat(saeiInput.value) >= 0) {
+                const saei = parseFloat(saeiInput.value);
+                
+                if (saei < 14) {
+                    gradeSelect.disabled = true;
+                    gradeSelect.value = "";
+                    gradeSelect.options[0].text = "-- راسب (السعي < 14) --";
+                } else {
+                    gradeSelect.disabled = false;
+                    updateGradeOptions(gradeSelect, saei);
+                }
+            } else {
+                gradeSelect.disabled = true;
+                gradeSelect.value = "";
+                gradeSelect.options[0].text = "-- أدخل السعي أولاً --";
+            }
+        }
+
+        function updateGradeOptions(gradeSelect, saei) {
+            const options = gradeSelect.options;
+            let hasValidOption = false;
+
+            for (let i = 1; i < options.length; i++) {
+                const opt = options[i];
+                const gradeData = GRADES_MAP[opt.value];
+
+                if (!gradeData) continue;
+
+                const maxPossible = saei + 50;
+                const minPossibleFinal = gradeData.minTarget >= 50 ? 25 : 0;
+                
+                const canReachMin = maxPossible >= gradeData.minTarget;
+                const canStayUnderMax = (saei + minPossibleFinal) <= gradeData.maxTarget;
+
+                if (canReachMin && canStayUnderMax) {
+                    opt.style.display = '';
+                    opt.disabled = false;
+                    hasValidOption = true;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            }
+
+            if (!hasValidOption) {
+                options[0].text = "-- السعي لا يكفي للنجاح --";
+            } else {
+                options[0].text = "-- اختر التقدير --";
+            }
+            
+            // إعادة ضبط الاختيار إذا كان التقدير المختار حالياً غير متاح
+            if (gradeSelect.value && GRADES_MAP[gradeSelect.value]) {
+                const selectedOpt = Array.from(options).find(opt => opt.value === gradeSelect.value);
+                if (selectedOpt && selectedOpt.style.display === 'none') {
+                    gradeSelect.value = "";
+                }
+            }
+        }
+
+        function updateExamDropdown(subjectId) {
+            const saeiInput = document.getElementById(`${subjectId}_saei`);
+            const gradeSelect = document.getElementById(`${subjectId}_final_grade`);
+            const examSelect = document.getElementById(`${subjectId}_predicted_exam`);
+
+            const saei = parseFloat(saeiInput.value);
+
+            // تصفير قائمة الفاينل في حالة وجود خلل في السعي أو عدم اختيار تقدير
+            if (isNaN(saei) || saei < 14 || !gradeSelect.value) {
+                examSelect.innerHTML = '<option value="">-</option>';
+                examSelect.disabled = true;
+                return;
+            }
+
+            const gradeData = GRADES_MAP[gradeSelect.value];
+            
+            // حساب الحدود الدنيا والقصوى المسموحة لدرجة الفاينل
+            let minExam = gradeData.minTarget - saei;
+            let maxExam = gradeData.maxTarget - saei;
+
+            // تطبيق قيود النجاح
+            if (gradeData.minTarget >= 50 && minExam < 25) minExam = 25;
+            if (minExam < 0) minExam = 0;
+            if (maxExam > 50) maxExam = 50;
+
+            examSelect.innerHTML = '';
+            
+            if (minExam > maxExam) {
+                examSelect.innerHTML = '<option value="">-</option>';
+                examSelect.disabled = true;
+                return;
+            }
+
+            let previousValue = parseInt(examSelect.value);
+
+            for (let i = minExam; i <= maxExam; i++) {
+                examSelect.add(new Option(i, i));
+            }
+
+            examSelect.disabled = false;
+
+            if (!isNaN(previousValue) && previousValue >= minExam && previousValue <= maxExam) {
+                examSelect.value = previousValue;
+            } else {
+                examSelect.value = minExam;
+            }
+        }
+
+        function setupEventListeners() {
+            // مستمع زر التصدير
+            document.getElementById('btn-export-data').addEventListener('click', generateTextFile);
+            
+            // مستمعات النافذة المنبثقة للزر الصغير في الزاوية
+            document.getElementById('btn-gpa-info-corner').addEventListener('click', () =>
+                document.getElementById('gpa-modal').classList.add('show'));
+            document.getElementById('btn-close-modal').addEventListener('click', () =>
+                document.getElementById('gpa-modal').classList.remove('show'));
+        }
+
+        function mainUpdate() {
+            let totalWeightedScore = 0;
+            let sumEcts = 0;
+            let isEctsValid = true;
+            let allSubjectsCompleted = true;
+
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                const ectsInput = document.getElementById(`${sub.id}_ects`);
+                const saeiInput = document.getElementById(`${sub.id}_saei`);
+                const gradeSelect = document.getElementById(`${sub.id}_final_grade`);
+                const examSelect = document.getElementById(`${sub.id}_predicted_exam`);
+                const textGrade = document.getElementById(`${sub.id}_gpa_text`);
+                const gpaCell = document.getElementById(`${sub.id}_gpa_cell`);
+
+                let ectsVal = parseInt(ectsInput.value) || 0;
+                if (ectsVal < 2 || ectsVal > 8) {
+                    ectsInput.style.border = "2px solid red";
+                    isEctsValid = false;
+                } else {
+                    ectsInput.style.border = "1px solid #ccc";
+                }
+                sumEcts += ectsVal;
+
+                const saei = parseFloat(saeiInput.value);
+                const predictedExam = parseFloat(examSelect.value);
+
+                if (isNaN(saei) || saei < 0) {
+                    textGrade.innerText = "--";
+                    gpaCell.className = "";
+                    allSubjectsCompleted = false;
+                    return;
+                }
+
+                // رسوب تلقائي
+                if (saei < 14) {
+                    textGrade.innerText = "راسب";
+                    applyColorToCell(gpaCell, saei);
+                    totalWeightedScore += (saei * ectsVal);
+                    return;
+                }
+
+                if (gradeSelect.value === "" || isNaN(predictedExam)) {
+                    textGrade.innerText = "--";
+                    gpaCell.className = "";
+                    allSubjectsCompleted = false;
+                    return;
+                }
+
+                const totalScore = saei + predictedExam;
+
+                textGrade.innerText = totalScore.toFixed(2);
+                applyColorToCell(gpaCell, totalScore);
+                totalWeightedScore += (totalScore * ectsVal);
+            });
+
+            const warningDiv = document.getElementById('ects-warning');
+            const finalGpaElement = document.getElementById('final-gpa-word');
+            const exportBtn = document.getElementById('btn-export-data');
+
+            if (allSubjectsCompleted && sumEcts === 30 && isEctsValid) {
+                const gpa = parseFloat((totalWeightedScore / sumEcts).toFixed(2));
+                finalGpaElement.innerText = gpa.toFixed(2);
+                exportBtn.disabled = false;
+
+                if (gpa >= 90) finalGpaElement.style.color = "#1b5e20";
+                else if (gpa >= 80) finalGpaElement.style.color = "#2e7d32";
+                else if (gpa >= 70) finalGpaElement.style.color = "#333";
+                else if (gpa >= 60) finalGpaElement.style.color = "#555";
+                else if (gpa >= 50) finalGpaElement.style.color = "#777";
+                else finalGpaElement.style.color = "#d32f2f";
+            } else {
+                finalGpaElement.innerText = "--";
+                finalGpaElement.style.color = "#2e7d32";
+                exportBtn.disabled = true;
+            }
+
+            if (sumEcts !== 30 || !isEctsValid) {
+                warningDiv.style.display = 'block';
+                document.getElementById('current-ects-sum').innerText = sumEcts;
+            } else {
+                warningDiv.style.display = 'none';
+            }
+        }
+
+        function applyColorToCell(cell, score) {
+            cell.className = ""; // Reset
+            if (score >= 90) cell.classList.add("grade-excellent");
+            else if (score >= 80) cell.classList.add("grade-vgood");
+            else if (score >= 70) cell.classList.add("grade-good");
+            else if (score >= 60) cell.classList.add("grade-avg");
+            else if (score >= 50) cell.classList.add("grade-acceptable");
+            else cell.classList.add("grade-fail");
+        }
+
+        function generateTextFile() {
+            let content = `--- نتيجة المعدل الفصلي (GPA) ---\r\n`;
+            content += `--------------------------------------------------\r\n\r\n`;
+
+            APP_CONFIG.defaultSubjects.forEach(sub => {
+                const ects = document.getElementById(`${sub.id}_ects`).value;
+                const currentName = document.getElementById(`${sub.id}_name`).value;
+                const saei = document.getElementById(`${sub.id}_saei`).value || "-";
+                const gradeKey = document.getElementById(`${sub.id}_final_grade`).value;
+                const examSelectValue = document.getElementById(`${sub.id}_predicted_exam`).value;
+                
+                let gradeLabel = "--";
+                let totalScoreDisplay = "-";
+                let predictedExamDisplay = "-";
+                
+                if (saei !== "-") {
+                    const saeiNum = parseFloat(saei);
+                    if (saeiNum < 14) {
+                        gradeLabel = "راسب (السعي أقل من 14)";
+                        totalScoreDisplay = saei;
+                    } else if (gradeKey && examSelectValue !== "") {
+                        gradeLabel = GRADES_MAP[gradeKey].label;
+                        const predictedExamNum = parseFloat(examSelectValue);
+                        const totalScore = saeiNum + predictedExamNum;
+                        
+                        totalScoreDisplay = totalScore.toFixed(0);
+                        predictedExamDisplay = predictedExamNum.toFixed(0);
+                    }
+                }
+
+                content += `${currentName}\r\nعدد الوحدات: ${ects}\r\nالسعي: ${saei}\r\nالتقدير المحرز: ${gradeLabel}\r\nدرجة الفاينل المتوقعة: ${predictedExamDisplay}\r\nالدرجة النهائية: ${totalScoreDisplay}\r\n\r\n`;
+            });
+
+            const finalGpaText = document.getElementById('final-gpa-word').innerText;
+            content += `--------------------------------------------------\r\nالمعدل الفصلي العام (GPA) المتوقع: ${finalGpaText}\r\n`;
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+            link.download = `نتيجة_المعدل_الفصلي.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

@@ -2,36 +2,10 @@
 
 // === INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', () => {
-    populateDropdowns();
     buildTable();
     setupEventListeners();
     mainUpdate();
 });
-
-/**
- * Populate dropdown menus with config data
- */
-function populateDropdowns() {
-    const fill = (id, data) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.innerHTML = "";
-        data.forEach(item => el.add(new Option(item, item)));
-    };
-    fill('academic-year-select', APP_CONFIG.academicYears);
-    fill('stage-name', APP_CONFIG.stages);
-    fill('semester-name', APP_CONFIG.semesters);
-}
-
-/**
- * Toggle save window visibility
- */
-function toggleSaveWindow() {
-    const content = document.getElementById('save-window-content');
-    content.classList.toggle('show');
-    const icon = document.getElementById('tab-icon');
-    icon.innerText = content.classList.contains('show') ? '▲' : '▼';
-}
 
 /**
  * Handle saei input change
@@ -58,17 +32,14 @@ function handleGradeChange(subjectId) {
  * Setup all event listeners
  */
 function setupEventListeners() {
-    // Toggle save window
-    document.getElementById('btn-toggle-save').addEventListener('click', toggleSaveWindow);
-    
     // Modal open/close
     document.getElementById('btn-gpa-info').addEventListener('click', () =>
         document.getElementById('gpa-modal').classList.add('show'));
     document.getElementById('btn-close-modal').addEventListener('click', () =>
         document.getElementById('gpa-modal').classList.remove('show'));
-    
-    // Export button
-    document.getElementById('btn-export').addEventListener('click', generateTextFile);
+
+    // Quick save button
+    document.getElementById('btn-quick-save').addEventListener('click', quickSave);
     
     // Input event listeners for table cells
     APP_CONFIG.defaultSubjects.forEach(sub => {
@@ -108,6 +79,5 @@ function setupEventListeners() {
     });
 }
 
-// Expose handlers globally for inline HTML usage (temporary compatibility)
 window.handleSaeiChange = handleSaeiChange;
 window.handleGradeChange = handleGradeChange;

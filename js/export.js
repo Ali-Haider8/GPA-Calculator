@@ -5,9 +5,6 @@
  * @returns {Object} Results data object
  */
 function collectResultsData() {
-    const studentName = getVal('student-name');
-    const academicYearDisplay = document.getElementById('academic-year-select').value;
-
     const subjects = APP_CONFIG.defaultSubjects.map(sub => {
         const ects = document.getElementById(`${sub.id}_ects`).value;
         const currentName = document.getElementById(`${sub.id}_name`).value;
@@ -44,47 +41,8 @@ function collectResultsData() {
         };
     });
 
-    const finalGpaText = document.getElementById('final-gpa-word').innerText;
-
-    return {
-        studentName,
-        university: getVal('uni-name'),
-        college: getVal('college-name'),
-        department: getVal('dept-name'),
-        academicYear: academicYearDisplay,
-        stage: getVal('stage-name'),
-        semester: getVal('semester-name'),
-        subjects,
-        finalGpa: finalGpaText
-    };
-}
-
-/**
- * Format results data as plain text
- * @param {Object} data - Results data object
- * @returns {string} Formatted text content
- */
-function formatAsText(data) {
-    let content = `اسم الطالب: ${data.studentName}\r\n`;
-    content += `الجامعة: ${data.university}\r\n`;
-    content += `الكلية: ${data.college}\r\n`;
-    content += `القسم: ${data.department}\r\n`;
-    content += `السنة الدراسية: ${data.academicYear} | المرحلة: ${data.stage} | الفصل: ${data.semester}\r\n`;
-    content += `--------------------------------------------------\r\n\r\n`;
-
-    data.subjects.forEach(sub => {
-        content += `${sub.name}\r\n`;
-        content += `عدد الوحدات: ${sub.ects}\r\n`;
-        content += `السعي: ${sub.saei}\r\n`;
-        content += `التقدير المحرز: ${sub.gradeLabel}\r\n`;
-        content += `درجة الفاينل المتوقعة: ${sub.predictedExam}\r\n`;
-        content += `الدرجة النهائية: ${sub.totalScore}\r\n\r\n`;
-    });
-
-    content += `--------------------------------------------------\r\n`;
-    content += `المعدل الفصلي العام (GPA) المتوقع: ${data.finalGpa}\r\n`;
-
-    return content;
+    const finalGpa = document.getElementById('final-gpa-word').innerText;
+    return { subjects, finalGpa };
 }
 
 /**
@@ -102,15 +60,19 @@ function downloadFile(content, filename) {
 }
 
 /**
- * Main export function - generates and downloads results file
+ * Quick save - downloads only subjects + GPA, no extra info
  */
-function generateTextFile() {
+function quickSave() {
     const data = collectResultsData();
-    const content = formatAsText(data);
-    
-    const filename = data.studentName !== "-" 
-        ? `نتيجة_${data.studentName.replace(/\s+/g, '_')}.txt` 
-        : `نتيجة_طالب.txt`;
-    
-    downloadFile(content, filename);
+
+    let content = '';
+    data.subjects.forEach(sub => {
+        content += `${sub.name}\r\n`;
+        content += `  وحدات: ${sub.ects} | سعي: ${sub.saei} | تقدير: ${sub.gradeLabel} | فاينل: ${sub.predictedExam} | مجموع: ${sub.totalScore}\r\n\r\n`;
+    });
+    content += `--------------------------------------------------\r\n`;
+    content += `المعدل الفصلي (GPA) المتوقع: ${data.finalGpa}\r\n`;
+
+    downloadFile(content, 'نتائج_سريعة.txt');
 }
+

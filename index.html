@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حاسبة المعدل الفصلي - مسار بولونيا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Roboto+Mono:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- MathJax for GPA Formula Display -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -27,12 +30,6 @@
 
     <div class="app-container">
         
-        <!-- GPA Display Screen -->
-        <div class="gpa-screen" id="screen-container" style="display: flex;">
-            <div class="gpa-label">المعدل الفصلي (GPA) المتوقع</div>
-            <div class="gpa-value" id="final-gpa-word">--</div>
-        </div>
-
         <!-- ECTS Warning Message -->
         <div class="warning-box" id="ects-warning">
             المجموع الحالي للوحدات: <span id="current-ects-sum">0</span>. يجب أن يكون 30 وحدة بالضبط!
@@ -52,48 +49,18 @@
                     </tr>
                 </thead>
                 <tbody id="subjects-body"></tbody>
+                <tfoot id="screen-container">
+                    <tr>
+                        <td colspan="5" class="gpa-footer-label">المعدل الفصلي (GPA) المتوقع</td>
+                        <td class="gpa-footer-value" id="final-gpa-word">--</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 
-        <!-- Collapsible Save/Export Section -->
-        <div class="collapsible-container">
-            <button class="toggle-tab-btn" id="btn-toggle-save">
-                <span>إظهار نافذة الحفظ والتصدير</span>
-                <span id="tab-icon">▼</span>
-            </button>
-
-            <div class="footer-section" id="save-window-content">
-                <div class="info-grid">
-                    <div class="full-width">
-                        <label>اسم الطالب:
-                            <input type="text" id="student-name" placeholder="اختياري...">
-                        </label>
-                    </div>
-
-                    <label>الجامعة:
-                        <input type="text" id="uni-name" value="جامعة الكوفة">
-                    </label>
-                    <label>الكلية:
-                        <input type="text" id="college-name" value="كلية علوم الحاسوب والرياضيات">
-                    </label>
-
-                    <label>القسم:
-                        <input type="text" id="dept-name" value="علوم الحاسوب">
-                    </label>
-                    <label>السنة الدراسية:
-                        <select id="academic-year-select"></select>
-                    </label>
-
-                    <label>المرحلة:
-                        <select id="stage-name"></select>
-                    </label>
-                    <label>الكورس (الفصل):
-                        <select id="semester-name"></select>
-                    </label>
-                </div>
-
-                <button class="btn-success" id="btn-export">حفظ النتائج وتصدير ملف (.txt)</button>
-            </div>
+        <!-- Save Button -->
+        <div class="save-bar">
+            <button class="btn-quick-save" id="btn-quick-save" disabled>&#128190; حفظ</button>
         </div>
     </div>
 
@@ -111,7 +78,7 @@
             <p>معدل الـ <strong>GPA</strong> (Grade Point Average) هو المقياس العالمي لتقييم أداء الطالب الأكاديمي في <strong>مسار بولونيا</strong>.</p>
             <hr>
             <div class="math-box">
-                <strong style="color: #2e7d32;">المعادلة الرسمية:</strong><br><br>
+                <strong style="color: #1565c0;">المعادلة الرسمية:</strong><br><br>
                 $$GPA = \frac{\sum (ECTS \times Grade)}{Total \ ECTS}$$
             </div>
         </div>

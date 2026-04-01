@@ -76,6 +76,12 @@ function mainUpdate() {
         finalGpaElement.style.color = "#2e7d32";
     }
 
+    // Enable/disable quick save button
+    const quickSaveBtn = document.getElementById('btn-quick-save');
+    if (quickSaveBtn) {
+        quickSaveBtn.disabled = !(allSubjectsCompleted && sumEcts === TOTAL_ECTS_TARGET && isEctsValid);
+    }
+
     // Show/hide ECTS warning
     if (sumEcts !== TOTAL_ECTS_TARGET || !isEctsValid) {
         warningDiv.style.display = 'block';

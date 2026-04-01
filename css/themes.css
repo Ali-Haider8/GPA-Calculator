@@ -5,41 +5,47 @@
     background-color: var(--color-grade-excellent-bg); 
     color: var(--color-grade-excellent-text); 
     font-weight: bold; 
+    border: 1px solid rgba(13, 93, 57, 0.18);
 }
 
 .grade-vgood { 
     background-color: var(--color-grade-vgood-bg); 
     color: var(--color-grade-vgood-text); 
     font-weight: bold; 
+    border: 1px solid rgba(13, 93, 57, 0.18);
 }
 
 .grade-good { 
     background-color: var(--color-grade-good-bg); 
     color: var(--color-grade-good-text); 
     font-weight: 600; 
+    border: 1px solid rgba(13, 71, 161, 0.15);
 }
 
 .grade-avg { 
     background-color: var(--color-grade-avg-bg); 
     color: var(--color-grade-avg-text); 
     font-weight: 600; 
+    border: 1px solid rgba(161, 90, 0, 0.2);
 }
 
 .grade-acceptable { 
     background-color: var(--color-grade-acceptable-bg); 
     color: var(--color-grade-acceptable-text); 
     font-weight: 600; 
+    border: 1px solid rgba(155, 62, 0, 0.18);
 }
 
 .grade-fail { 
     background-color: var(--color-grade-fail-bg); 
     color: var(--color-grade-fail-text); 
     font-weight: bold; 
+    border: 1px solid rgba(159, 18, 57, 0.22);
 }
 
 /* Modal Content Styles */
 .modal-content hr {
     border: none;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--color-border-modal);
     margin: var(--spacing-lg) 0;
 }

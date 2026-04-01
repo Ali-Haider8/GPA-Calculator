@@ -3,7 +3,6 @@
 const elements = {
     // GPA Display
     finalGpaWord: document.getElementById('final-gpa-word'),
-    screenContainer: document.getElementById('screen-container'),
     
     // Warning
     ectsWarning: document.getElementById('ects-warning'),
@@ -12,21 +11,6 @@ const elements = {
     // Table
     subjectsBody: document.getElementById('subjects-body'),
     finalHeader: document.getElementById('final-header'),
-    
-    // Dropdowns
-    academicYearSelect: document.getElementById('academic-year-select'),
-    stageName: document.getElementById('stage-name'),
-    semesterName: document.getElementById('semester-name'),
-    
-    // Save/Export Section
-    btnToggleSave: document.getElementById('btn-toggle-save'),
-    saveWindowContent: document.getElementById('save-window-content'),
-    tabIcon: document.getElementById('tab-icon'),
-    studentName: document.getElementById('student-name'),
-    uniName: document.getElementById('uni-name'),
-    collegeName: document.getElementById('college-name'),
-    deptName: document.getElementById('dept-name'),
-    btnExport: document.getElementById('btn-export'),
     
     // Modal
     btnGpaInfo: document.getElementById('btn-gpa-info'),
