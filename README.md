@@ -1,6 +1,6 @@
 # 📊 GPA Calculator - Bologna System
 
-<img src="https://i.vgy.me/fkhipt.png" width=250 alt="Results Export">
+<img src="https://i.vgy.me/wPlh9Z.png" width=750 alt="Results Export">
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Try%20Now-blue?style=for-the-badge)](https://gpa-calculator.linkyhost.com/)
 

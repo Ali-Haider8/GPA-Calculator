@@ -12,10 +12,10 @@ function buildTable() {
         tr.innerHTML = `
             <td data-label="المادة"><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}"></td>
             <td data-label="الوحدات"><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8"></td>
-            <td data-label="السعي (50)"><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="من 50" min="0" max="50"></td>
+            <td data-label="السعي (50)"><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="-" min="0" max="50"></td>
             <td data-label="التقدير المحرز">
                 <select id="${sub.id}_final_grade" disabled>
-                    <option value="">-- أدخل السعي أولاً --</option>
+                    <option value="">-</option>
                     <option value="excellence">امتياز (90-100)</option>
                     <option value="vGood">جيد جداً (80-89)</option>
                     <option value="good">جيد (70-79)</option>
@@ -162,6 +162,6 @@ function enableGradeSelect(subjectId) {
     } else {
         gradeSelect.disabled = true;
         gradeSelect.value = "";
-        gradeSelect.options[0].text = "-- أدخل السعي أولاً --";
+        gradeSelect.options[0].text = "-";
     }
 }
