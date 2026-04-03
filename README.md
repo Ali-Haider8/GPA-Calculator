@@ -6,6 +6,7 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Try%20Now-blue?style=for-the-badge)](https://gpa-calculator.linkyhost.com/)
 
+---
 ## ⚡ Advanced Features
 
 • 🧮 **Smart Exam Predictor** (calculates required final exam scores)
@@ -26,6 +27,22 @@
 > Helps students understand achievable outcomes
 
 > Useful for planning before exams
+---
+
+## 🔮 Future Improvements
+
+• 📊 **GPA Range Calculation**  
+  Calculate minimum and maximum possible GPA based on current inputs  
+
+• 📥 **Data Import**  
+  Import grades and course data from external files (e.g., JSON / CSV)  
+
+• ❓ **Enhanced Help Tooltip**  
+  Add more detailed explanations via an in-app help window ( ? )  
+
+• 📚 **Predefined Course Data**  
+  Include ready-made datasets for common subjects (course names + credit units)  
+
 ---
 
 ## 🧩 Technologies Used
