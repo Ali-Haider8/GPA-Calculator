@@ -250,6 +250,47 @@
             margin-top: 6px;
         }
 
+        .left-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-row-btn {
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-row-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .remove-row-main-btn {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-row-main-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(135deg, #c62828 0%, #8e0000 100%);
+        }
+
         .export-btn-inline {
             background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
             color: white;
@@ -401,8 +442,20 @@
                 margin-top: 8px;
             }
 
-            .bottom-actions > div {
-                display: none;
+            .left-actions {
+                width: 100%;
+            }
+
+            .add-row-btn {
+                width: 100%;
+                padding: 9px 10px;
+                font-size: 0.86rem;
+            }
+
+            .remove-row-main-btn {
+                width: 100%;
+                padding: 9px 10px;
+                font-size: 0.86rem;
             }
 
             .export-btn-inline {
@@ -536,7 +589,10 @@
         </div>
 
         <div class="bottom-actions">
-            <div></div> <!-- Spacer -->
+            <div class="left-actions">
+                <button class="add-row-btn" id="btn-add-subject" title="إضافة صف مادة جديد">+ إضافة مادة</button>
+                <button class="remove-row-main-btn" id="btn-remove-subject" title="حذف آخر صف مادة">- حذف مادة</button>
+            </div>
             <button class="export-btn-inline" id="btn-export-data" title="تصدير النتائج كملف نصي" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -563,14 +619,16 @@
 
     <script>
         // === CONFIG ===
+        let subjectCounter = 1;
         const APP_CONFIG = {
             defaultSubjects: [
-                { id: 'prog', name: 'اساسيات البرمجة', ects: 7 },
+                { id: 'prog', name: 'اساسيات البرمجة', ects: 6 },
                 { id: 'arch', name: 'تركيب الحاسوب', ects: 5 },
                 { id: 'math', name: 'الرياضيات', ects: 6 },
-                { id: 'arabic', name: 'لغة عربية', ects: 3 },
+                { id: 'arabic', name: 'لغة عربية', ects: 2 },
                 { id: 'english', name: 'أساسيات اللغة الإنجليزية', ects: 4 },
-                { id: 'skills', name: 'مهارات الحاسوب', ects: 5 }
+                { id: 'skills', name: 'مهارات الحاسوب', ects: 5 },
+                { id: 'human_rights', name: 'حقوق الانسان', ects: 2 }
             ]
         };
 
@@ -592,39 +650,67 @@
             mainUpdate();
         });
 
+        function getSubjectRowTemplate(sub) {
+            return `
+                <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}" oninput="mainUpdate()"></td>
+                <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8" oninput="mainUpdate()"></td>
+                <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="-" min="0" max="50" oninput="handleSaeiChange(this, '${sub.id}')"></td>
+                <td>
+                    <select id="${sub.id}_final_grade" onchange="handleGradeChange('${sub.id}')" disabled>
+                        <option value="">-</option>
+                        <option value="excellence">امتياز (90-100)</option>
+                        <option value="vGood">جيد جداً (80-89)</option>
+                        <option value="good">جيد (70-79)</option>
+                        <option value="avg">متوسط (60-69)</option>
+                        <option value="acceptable">مقبول (50-59)</option>
+                        <option value="fail_fx">راسب قيد المعالجة (45-49)</option>
+                        <option value="fail_f">راسب (0-44)</option>
+                    </select>
+                </td>
+                <td id="${sub.id}_predicted_exam_cell">
+                    <select id="${sub.id}_predicted_exam" class="exam-select" onchange="mainUpdate()" disabled>
+                        <option value="">-</option>
+                    </select>
+                </td>
+                <td id="${sub.id}_gpa_cell">
+                    <span id="${sub.id}_gpa_text" style="font-weight:bold;">--</span>
+                </td>
+            `;
+        }
+
         function buildTable() {
             const tbody = document.getElementById('subjects-body');
             tbody.innerHTML = "";
 
             APP_CONFIG.defaultSubjects.forEach((sub) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><input type="text" id="${sub.id}_name" class="name-input" value="${sub.name}" oninput="mainUpdate()"></td>
-                    <td><input type="number" inputmode="numeric" id="${sub.id}_ects" class="ects-input" value="${sub.ects}" min="2" max="8" oninput="mainUpdate()"></td>
-                    <td><input type="number" inputmode="numeric" id="${sub.id}_saei" placeholder="-" min="0" max="50" oninput="handleSaeiChange(this, '${sub.id}')"></td>
-                    <td>
-                        <select id="${sub.id}_final_grade" onchange="handleGradeChange('${sub.id}')" disabled>
-                            <option value="">-</option>
-                            <option value="excellence">امتياز (90-100)</option>
-                            <option value="vGood">جيد جداً (80-89)</option>
-                            <option value="good">جيد (70-79)</option>
-                            <option value="avg">متوسط (60-69)</option>
-                            <option value="acceptable">مقبول (50-59)</option>
-                            <option value="fail_fx">راسب قيد المعالجة (45-49)</option>
-                            <option value="fail_f">راسب (0-44)</option>
-                        </select>
-                    </td>
-                    <td id="${sub.id}_predicted_exam_cell">
-                        <select id="${sub.id}_predicted_exam" class="exam-select" onchange="mainUpdate()" disabled>
-                            <option value="">-</option>
-                        </select>
-                    </td>
-                    <td id="${sub.id}_gpa_cell">
-                        <span id="${sub.id}_gpa_text" style="font-weight:bold;">--</span>
-                    </td>
-                `;
+                tr.id = `row_${sub.id}`;
+                tr.innerHTML = getSubjectRowTemplate(sub);
                 tbody.appendChild(tr);
             });
+        }
+
+        function generateSubjectId() {
+            const id = `custom_${Date.now()}_${subjectCounter}`;
+            subjectCounter += 1;
+            return id;
+        }
+
+        function addSubjectRow() {
+            const newSubject = { id: generateSubjectId(), name: 'مادة جديدة', ects: 2 };
+            APP_CONFIG.defaultSubjects.push(newSubject);
+            buildTable();
+            mainUpdate();
+        }
+
+        function removeLastSubjectRow() {
+            if (APP_CONFIG.defaultSubjects.length <= 1) {
+                alert('يجب أن يبقى صف مادة واحد على الأقل.');
+                return;
+            }
+            APP_CONFIG.defaultSubjects.pop();
+            buildTable();
+            mainUpdate();
         }
 
         function validate(el, max) {
@@ -760,6 +846,8 @@
         function setupEventListeners() {
             // مستمع زر التصدير
             document.getElementById('btn-export-data').addEventListener('click', generateTextFile);
+            document.getElementById('btn-add-subject').addEventListener('click', addSubjectRow);
+            document.getElementById('btn-remove-subject').addEventListener('click', removeLastSubjectRow);
             
             // مستمعات النافذة المنبثقة للزر الصغير في الزاوية
             document.getElementById('btn-gpa-info-corner').addEventListener('click', () =>
